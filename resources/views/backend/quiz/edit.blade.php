@@ -44,7 +44,7 @@
                                                 @foreach ($question->options as $key => $option)
                                                     <input type="radio" value="{{ $key }}"
                                                            @if($option->is_right_option == 1) checked="checked"
-                                                           @endif name="answer"> {{ $option->option }}  &nbsp; &nbsp;
+                                                           @endif name="{{$question->question}}"> {{ $option->option }}  &nbsp; &nbsp;
                                                 @endforeach
                                             </label>
                                         </div>
