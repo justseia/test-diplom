@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\EducationController;
+use App\Http\Controllers\Api\QuizController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +17,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::controller(\App\Http\Controllers\Api\AuthController::class)->group(function () {
+    Route::post('register', 'register');
+    Route::post('login', 'login');
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::resource('education', EducationController::class);
+    Route::get('/profile/{id}', [UserController::class, 'profile']);
+    Route::get('/quiz', [QuizController::class, 'index']);
 });

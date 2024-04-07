@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Backend;
 
-use App\Quiz;
-use App\Option;
-use App\Question;
-use App\QuizInvite;
+use App\Models\Option;
+use App\Models\Question;
+use App\Models\Quiz;
+use App\Models\QuizInvite;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -31,7 +31,7 @@ class QuizShareController extends Controller
             $token = Str::random(16);
         }
         while ($this->quizInvite->where('token', $token)->first());
-        
+
         $quizInvite = $this->quizInvite->create([
                                 'email' => $request->email,
                                 'token' => $token
@@ -49,6 +49,6 @@ class QuizShareController extends Controller
         $invite = $this->quizInvite->where('token', $token)->first();
 
         return redirect()->route('home')->with('success', ' Test completed.');
-    
+
     }
 }

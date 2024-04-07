@@ -19,8 +19,12 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'urlAvatar',
         'name',
         'email',
+        'age',
+        'medcoins',
+        'aboutMe',
         'password',
     ];
 
@@ -43,4 +47,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function quizzes()
+    {
+        return $this->belongsToMany(Quiz::class, 'user_participants')->withPivot('score', 'participation_status');
+    }
+
 }

@@ -17,26 +17,29 @@
     <!-- Custom Theme Style -->
     <link href="{{ asset('node_modules/gentelella/build/css/custom.min.css') }}" rel="stylesheet">
 	<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/b734116fe6.js" crossorigin="anonymous"></script>
 
 	@yield('style')
-	
+
 </head>
 
 <body class="nav-md">
     <div class="container body">
         <div class="main_container">
-			
+
 			<div class="col-md-3 left_col">
                 @include('backend.partials.sidebar-menu')
             </div>
-			
+
 			<!-- top navigation -->
+{{--
             @include('backend.partials.top-menu')
+--}}
             <!-- /top navigation -->
-			
+
 			<!-- page content -->
             <div class="right_col" role="main">
-                <div class="">
+                <div class="" style="background-color: lightgray">
 
                     @yield('content')
                 </div>

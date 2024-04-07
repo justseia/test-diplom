@@ -73,6 +73,9 @@ class DashboardController extends Controller
             'newUsers' => User::where('created_at', '>', now()->startOfMonth())->count(),
             'newQuizzes' => Quiz::where('created_at', '>', now()->startOfMonth())->count(),
             'selectedMonth' => now()->format('F, Y'),
-            'months' => $months]);
+            'months' => $months,
+            'averageAge' => 20,
+            'averageScore' => 20,
+        ]);
     }
 }

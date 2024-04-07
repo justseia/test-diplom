@@ -15,7 +15,7 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\Http\Response
      */
     public function index()
     {
@@ -25,6 +25,24 @@ class UserController extends Controller
         return view('backend.users.index')->with('users', $users);
     }
 
+    public function getUsers()
+    {
+        $users = User::role('User')->orderBy('updated_at', 'desc')->paginate(20);
+        $selectedUser = $users->first(); // As an example, select the first user
+        return view('backend.users.indexUsers')->with( [
+            'users' => $users,
+            'selectedUser' => $selectedUser
+        ]);
+    }
+    public function getTeachers()
+    {
+        $users = User::role('Teacher')->orderBy('updated_at', 'desc')->paginate(20);
+        $selectedUser = $users->first(); // As an example, select the first user
+        return view('backend.users.indexTeachers')->with( [
+            'users' => $users,
+            'selectedUser' => $selectedUser
+        ]);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -35,6 +53,11 @@ class UserController extends Controller
         $roles = Role::get();
 
         return view('backend.users.create', ['roles' => $roles]);
+    }
+
+    public function createTeacher()
+    {
+        return view('backend.users.createTeacher');
     }
 
     /**
@@ -48,12 +71,34 @@ class UserController extends Controller
         $this->validate($request, [
             'name'     =>'required|max:120',
             'email'    =>'required|email|unique:users',
+            'age'    =>'required',
             'password' =>'required|min:5|confirmed'
         ]);
 
+        $path = null;
+
+        if ($request->hasFile('urlAvatar')) {
+            $file = $request->file('urlAvatar');
+
+            // You can also validate the file here (e.g., size, mime types)
+
+            // Generate a unique file name to prevent overwriting
+            $fileName = time().'.'.$file->getClientOriginalExtension();
+
+            // Save the file to your desired location, 'public' could be any disk defined in your filesystems.php config
+            $path = $file->storeAs('images', $fileName, 'public');
+
+            // If you want to save the path to the database, you can use $path variable
+
+            // Return success response or redirect
+        }
+
         $user = User::create([
+                                'urlAvatar' => $path,
                                 'name' => $request->name,
                                 'email' => $request->email,
+                                'age' => $request->age,
+                                'aboutMe' => $request->aboutMe,
                                 'password' => bcrypt($request->password)
                             ]);
 
@@ -62,8 +107,30 @@ class UserController extends Controller
 
         $user->assignRole($my_role); //Assigning role to user
 
-        // flash('User successfully added!')->success();
-        return redirect()->route('user.index');
+       //  flash('User successfully added!')->success();
+        return redirect()->route('user.getUsers');
+    }
+
+    public function storeTeacher(Request $request)
+    {
+        $this->validate($request, [
+            'name'     =>'required|max:120',
+            'email'    =>'required|email|unique:users',
+            'password' =>'required|min:5'
+        ]);
+
+        $user = User::create([
+                                'name' => $request->name,
+                                'email' => $request->email,
+                                'password' => bcrypt($request->password)
+                            ]);
+
+        $my_role = Role::where('id', '=', 2)->firstOrFail();
+
+        $user->assignRole($my_role); //Assigning role to user
+
+       //  flash('User successfully added!')->success();
+        return redirect()->route('user.getTeachers');
     }
 
     /**

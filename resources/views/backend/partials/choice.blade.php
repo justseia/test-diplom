@@ -1,4 +1,4 @@
-<form method="POST" action="{{ route('quiz.edit', $quiz->slug) }}" class="">
+<form method="POST" action="{{ route('quiz.edit', $quiz->id) }}" class="">
 
     <div class="row input_row">
         <div class="col-md-12">
@@ -6,7 +6,7 @@
                 <label class="control-label col-md-2 col-sm-2 col-xs-12">Question <span class="required">*</span></label>
                 <div class="col-md-6 col-sm-6 col-xs-12">
                     <input type="text" name="question" required="required" placeholder="Enter your question" class="form-control">
-                    
+
                 </div>
             </div>
         </div>
@@ -29,7 +29,7 @@
                 <label class="control-label col-md-2 col-sm-2 col-xs-12">Option 2 </label>
                 <div class="col-md-6 col-sm-6 col-xs-12">
                     <input type="text" name="options[]" placeholder="Option 2 " class="form-control">
-                    
+
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@
                 <label class="control-label col-md-2 col-sm-2 col-xs-12">Option 3 </label>
                 <div class="col-md-6 col-sm-6 col-xs-12">
                     <input type="text" name="options[]" placeholder="Option 2 " class="form-control">
-                    
+
                 </div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                 <label class="control-label col-md-2 col-sm-2 col-xs-12">Option 4 </label>
                 <div class="col-md-6 col-sm-6 col-xs-12">
                     <input type="text" name="options[]" placeholder="Option 4 " class="form-control">
-                    
+
                 </div>
             </div>
         </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend;
 use App\Models\Option;
 use App\Models\Question;
 use App\Models\Quiz;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,24 +15,30 @@ use App\Http\Services\Quiz as SaveQuizOption;
 class QuizController extends Controller
 {
     public function __construct(
-        Quiz $quiz,
-        Option $option,
+        Quiz     $quiz,
+        Option   $option,
         Question $question
-    ){
+    )
+    {
         $this->quiz = $quiz;
         $this->option = $option;
         $this->question = $question;
     }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $quizs = $this->quiz->all();
-
-        return view('backend.quiz.index', ['quizs' => $quizs]);
+        $quizs = $this->quiz->with('creator')->withCount('participants')->get();
+        if ($request->quiz_id) {
+            $selectedquiz = $quizs->where('id', $request->quiz_id)->first();
+        } else {
+            $selectedquiz = $quizs->first();
+        }
+        return view('backend.quiz.index', ['quizzes' => $quizs, 'selectedquiz' => $selectedquiz]);
     }
 
     /**
@@ -41,15 +48,13 @@ class QuizController extends Controller
      */
     public function create()
     {
-        $quizs = $this->quiz->all();
-
-        return view('backend.quiz.create', ['quizs' => $quizs]);
+        return view('backend.quiz.create');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -58,12 +63,18 @@ class QuizController extends Controller
             'name' => 'required',
         ]);
 
-        $slug = $this->makeSlug($request->name);
         $quiz = new $this->quiz;
-
-        $quiz->name = $request->name;
-        $quiz->slug = $slug;
+        $quiz->title = $request->name;
+        $quiz->author = auth()->user()->id;
         $quiz->save();
+
+        if ($request->hasFile('images')) {
+            $file = $request->file('images');
+            $path = $file->store('public');
+            $fileName = basename($path);
+            $quiz->image_url = $fileName;
+            $quiz->save();
+        }
 
         return redirect()->action([QuizController::Class, 'index']);
     }
@@ -71,7 +82,7 @@ class QuizController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -82,55 +93,66 @@ class QuizController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($slug, Request $request)
+    public function edit($id, Request $request)
     {
-
-        $type = $request->type;
-
-        $quiz = $this->quiz->where('slug', $slug)->firstOrFail();
+        $quiz = $this->quiz->where('id', $id)->firstOrFail();
 
         $questions = $this->question->with('options')
-                                ->where('quiz_id', $quiz->id)->get();
+            ->where('quiz_id', $quiz->id)->get();
 
         return view('backend.quiz.edit', [
-                                        'quiz' => $quiz,
-                                        'questions' => $questions,
-                                        'type' => $type
-                                    ]);
+            'quiz' => $quiz,
+            'questions' => $questions,
+            'type' => 'choice'
+        ]);
     }
+    public function questions($id)
+    {
+        $quiz = $this->quiz->where('id', $id)->firstOrFail();
+
+        $questions = $this->question->with('options')
+            ->where('quiz_id', $quiz->id)->get();
+
+        return view('backend.quiz.edit', [
+            'quiz' => $quiz,
+            'questions' => $questions,
+            'type' => 'choice'
+        ]);
+    }
+
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update($slug, Request $request)
     {
         // DB::transaction(function() use ($slug, $request) {
 
-            $this->validate($request, [
-                    'question' => 'required',
-                    'options.*' => 'required'
-                ]);
+        $this->validate($request, [
+            'question' => 'required',
+            'options.*' => 'required'
+        ]);
 
-            $type = $request->type;
+        $type = $request->type;
 
-            $quiz = $this->quiz->where('slug', $slug)->firstOrFail();
+        $quiz = $this->quiz->where('slug', $slug)->firstOrFail();
 
-            //update question to db
-            $question = new Question;
-            $question->quiz_id  = $quiz->id;
-            $question->question = $request->question;
-            $question->type = $request->type;
-            $question->is_active = 1;
-            $question->save();
+        //update question to db
+        $question = new Question;
+        $question->quiz_id = $quiz->id;
+        $question->question = $request->question;
+        $question->type = $request->type;
+        $question->is_active = 1;
+        $question->save();
 
-            $saveOption = (new SaveQuizOption)->saveOptions($request, $question, $type);
+        $saveOption = (new SaveQuizOption)->saveOptions($request, $question, $type);
 
         // });
 
@@ -140,13 +162,13 @@ class QuizController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request)
     {
 
-        DB::transaction(function() use ($request){
+        DB::transaction(function () use ($request) {
             $quiz = $this->quiz->with('questions.options')->where('id', $request->id);
             $quiz->delete();
         });
@@ -154,16 +176,20 @@ class QuizController extends Controller
         return redirect()->route('quiz.index')->with('success', 'Record deleted successfully.');
     }
 
-    /** make slug from title */
-    public function makeSlug($name)
+    public function inactivate(Request $request)
     {
+        $quiz = Quiz::find($request->id);
+        $quiz->is_active = 0;
+        $quiz->save();
+        return redirect()->route('quiz.index');
 
-        $slug = Str::slug($name);
+    }
+    public function activate(Request $request)
+    {
+        $quiz = Quiz::find($request->id);
+        $quiz->is_active = 1;
+        $quiz->save();
+        return redirect()->route('quiz.index');
 
-        $count = Quiz::where('slug', 'LIKE', '%'. $slug . '%')->count();
-
-        $addCount = $count + 1;
-
-        return $count ? "{$slug}-{$addCount}" : $slug;
     }
 }

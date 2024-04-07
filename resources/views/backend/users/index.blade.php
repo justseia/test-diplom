@@ -9,7 +9,7 @@
 
     @if( ! Auth::user()->can('manage_user'))
         @include('errors.401')
-    @else        
+    @else
         <div class="x_panel">
             <div class="x_title">
                 <h2>

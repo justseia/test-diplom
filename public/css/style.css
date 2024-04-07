@@ -14,3 +14,6 @@
 .name_label { min-width: 100px; }
 .name_input { min-width: 300px; }
 .btn_create { margin-left: 15px; }
+.bradius {
+    border-radius: 10px
+}

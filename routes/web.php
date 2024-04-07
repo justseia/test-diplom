@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Backend\DashboardController;
+use App\Http\Controllers\Backend\EducationController;
 use App\Http\Controllers\Backend\QuizController;
 use App\Http\Controllers\Backend\RoleController;
 use App\Http\Controllers\Backend\SearchUserController;
@@ -29,8 +30,6 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::controller(QuizController::class)->group(function () {
     Route::get('quiz', 'index')->name('quiz');
-    Route::get('quiz/accept/{slug}/{token}', 'accept')->name('quiz.accept');
-    Route::post('quiz/accept/{slug}/{token}', 'answer');
 });
 
 Route::group(['middleware' => ['auth']], function () {
@@ -39,15 +38,37 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('user-permission-update/{id}', [UserController::class, 'updatePermission]'])->name('user-permission-update');
 
     Route::resource('user', UserController::class);
+    Route::resource('education', EducationController::class);
+
+    Route::post('/import-education', [EducationController::class, 'import'])->name('import-education');
+
+    Route::controller(EducationController::class)->group(function () {
+        Route::get('education/{id}/info', 'info')->name('education.info');
+        Route::post('/info', 'saveInfo')->name('education.saveInfo');
+
+        Route::get('education/{id}/diseases', 'diseases')->name('education.diseases');
+        Route::post('/diseases', 'saveDiseases')->name('education.saveDiseases');
+    });
+
+    Route::controller(UserController::class)->group(function () {
+        Route::get('getUsers', 'getUsers')->name('user.getUsers');
+        Route::get('getTeachers', 'getTeachers')->name('user.getTeachers');
+        Route::get('createTeacher', 'createTeacher')->name('teacher.create');
+        Route::post('store', 'storeTeacher')->name('teacher.store');
+    });
     Route::resource('role', RoleController::class);
 
-    Route::controller(QuizController::class)->group(function (){
+    Route::controller(QuizController::class)->group(function () {
         Route::get('quiz', 'index')->name('quiz.index');
-        Route::post('quiz', 'store');
-        Route::get('quiz/edit/{slug}', 'edit')->name('quiz.edit');
-        Route::post('quiz/edit/{slug}', 'update');
+        Route::get('quiz/questions', 'questions')->name('quiz.questions');
+        Route::post('quiz', 'store')->name('quiz.store');
+        Route::post('activate', 'activate')->name('quiz.activate');
+        Route::post('inactivate', 'inactivate')->name('quiz.inactivate');
+        Route::get('/quiz/create', 'create')->name('quiz.create');
+        Route::get('quiz/edit/{id}', 'edit')->name('quiz.edit');
+        Route::post('quiz/edit/{id}', 'update');
         Route::delete('quiz/delete', 'destroy')->name('quiz.destroy');
-        Route::post('quiz/invite/{slug}', 'invite')->name('quiz.invite');
     });
+    Route::post('quiz/invite/{slug}', [\App\Http\Controllers\Backend\QuizShareController::class, 'invite'])->name('quiz.invite');
 
 });

@@ -11,7 +11,19 @@ class Quiz extends Model
 
     protected $table = 'quizzes';
 
-    public function questions() {
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'author', 'id');
+    }
+
+    public function questions()
+    {
         return $this->hasMany(related: Question::class, foreignKey: 'quiz_id', localKey: 'id');
     }
+
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'user_participants')->withPivot('score', 'participation_status');
+    }
+
 }

@@ -4,21 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('questions', function (Blueprint $table) {
+        Schema::create('education_images', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('quiz_id');
-            $table->string('question');
+            $table->unsignedBigInteger('education_id');
+            $table->string('url');
+            $table->tinyInteger('is_info');
             $table->timestamps();
-
-            $table->foreign('quiz_id')
+            $table->foreign('education_id')
                 ->references('id')
-                ->on('quizzes')
+                ->on('education')
                 ->onDelete('cascade');
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('questions');
+        Schema::dropIfExists('education_images');
     }
 };
