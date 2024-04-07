@@ -3,9 +3,9 @@
 @section('page_title', 'Manage Quiz')
 
 @section('style')
-<style>
+    <style>
 
-</style>
+    </style>
 @stop
 
 @section('content')
@@ -37,17 +37,17 @@
                         <div class="row input_row">
                             <div class="col-md-12">
                                 <div class='form-group'>
-                                    <label class="control-label col-md-2 col-sm-2 col-xs-12">@if ($question->type == 'answer') Answer @else Options @endif</label>
+                                    <label class="control-label col-md-2 col-sm-2 col-xs-12">Options </label>
                                     <div class="col-md-10 col-sm-10 col-xs-12">
-                                        @if ($question->type == 'choice')
-                                            <div class="radio">
-                                                <label>
-                                                    @foreach ($question->options as $key => $option)
-                                                        <input type="radio" value="{{ $key }}" @if($option->is_right_option == 1) checked="checked" @endif name="answer"> {{ $option->option }}  &nbsp; &nbsp;
-                                                    @endforeach
-                                                </label>
-                                            </div>
-                                        @endif
+                                        <div class="radio">
+                                            <label>
+                                                @foreach ($question->options as $key => $option)
+                                                    <input type="radio" value="{{ $key }}"
+                                                           @if($option->is_right_option == 1) checked="checked"
+                                                           @endif name="answer"> {{ $option->option }}  &nbsp; &nbsp;
+                                                @endforeach
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

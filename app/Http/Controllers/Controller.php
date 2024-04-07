@@ -20,7 +20,7 @@ class Controller extends BaseController
         $response = [
             'success' => true,
             'data'    => $result,
-            'message' => $message,
+            'code' => $message,
         ];
 
         return response()->json($response, 200);
@@ -39,7 +39,7 @@ class Controller extends BaseController
         ];
 
         if(!empty($errorMessages)){
-            $response['data'] = $errorMessages;
+            $response['code'] = $errorMessages;
         }
 
         return response()->json($response, $code);

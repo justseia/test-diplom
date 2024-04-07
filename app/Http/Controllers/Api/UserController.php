@@ -18,13 +18,29 @@ class UserController extends Controller
             'email',
             'age',
             'medcoins',
-            'aboutMe')->where('id',$id)->first();
+            'aboutMe',
+            'blocked'
+        )->where('id',$id)->first();
         //$user = User::find($id);
 
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return $this->sendError('User not found',401);
+        }
+        if ($user->blocked == 1){
+            return $this->sendError('User blocked',401);
         }
          return response()->json($user, 200);
-        // return new UserResource($user);
+    }
+
+    public function medcoins(Request $request)
+    {
+        if (!empty($request->user_id) && !empty($request->coins)){
+            $user = User::find($request->user_id);
+            $user->medcoins = $request->coins;
+            $user->save();
+            return $this->sendResponse('User coins updated',200);
+        }else{
+            return $this->sendError('User id and coins required',403);
+        }
     }
 }

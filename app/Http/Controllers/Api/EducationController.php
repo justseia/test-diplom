@@ -12,7 +12,7 @@ class EducationController extends Controller
     public function index()
     {
         $educations = Education::select('id', 'title')->get();
-        return $this->sendResponse($educations, 'Get educations list');
+        return $this->sendResponse($educations, 200);
     }
 
     /**
@@ -53,7 +53,7 @@ class EducationController extends Controller
                 ->toArray();
 
             // Return the formatted response
-            return $this->sendResponse($education, 'Get education by id');
+            return $this->sendResponse($education, 200);
         }
 
         // Handle the case where the education detail is not found

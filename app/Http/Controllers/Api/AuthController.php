@@ -64,7 +64,7 @@ class AuthController extends Controller
         $success['token'] =  $user->createToken('MedQuiz')->plainTextToken;
         $success['name'] =  $user->name;
 
-        return $this->sendResponse($success, 'User register successfully.');
+        return $this->sendResponse($success, 200);
     }
 
     /**
@@ -79,7 +79,7 @@ class AuthController extends Controller
             $success['token'] =  $user->createToken('MedQuiz')->plainTextToken;
             $success['name'] =  $user->name;
 
-            return $this->sendResponse($success, 'User login successfully.');
+            return $this->sendResponse($success, 200);
         }
         else{
             return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);

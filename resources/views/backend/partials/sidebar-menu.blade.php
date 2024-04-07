@@ -18,9 +18,9 @@
             <ul class="nav side-menu" style="color: #1d2124">
 
                 <li><a href="{{ route('dashboard') }}"><i class="fa fa-home"></i> Dashboard </a></li>
-                @if( Auth::user()->can('manage_role'))
+               {{-- @if( Auth::user()->can('manage_role'))
                     <li><a href="{{ route('role.index') }}"><i class="fa fa-edit"></i> Manage Role </a></li>
-                @endif
+                @endif--}}
 
                 @if( Auth::user()->can('manage_user'))
 {{--                    <li><a href="{{ route('user.index') }}"><i class="fa fa-user"></i> All User </a></li>--}}

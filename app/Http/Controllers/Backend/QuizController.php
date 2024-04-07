@@ -131,7 +131,7 @@ class QuizController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update($slug, Request $request)
+    public function update($id, Request $request)
     {
         // DB::transaction(function() use ($slug, $request) {
 
@@ -141,22 +141,19 @@ class QuizController extends Controller
         ]);
 
         $type = $request->type;
-
-        $quiz = $this->quiz->where('slug', $slug)->firstOrFail();
+        $quiz = $this->quiz->where('id', $id)->firstOrFail();
 
         //update question to db
         $question = new Question;
         $question->quiz_id = $quiz->id;
         $question->question = $request->question;
-        $question->type = $request->type;
-        $question->is_active = 1;
         $question->save();
 
         $saveOption = (new SaveQuizOption)->saveOptions($request, $question, $type);
 
         // });
 
-        return redirect()->route('quiz.edit', $slug);
+        return redirect()->route('quiz.edit', $id);
     }
 
     /**

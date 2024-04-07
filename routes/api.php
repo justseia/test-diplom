@@ -25,5 +25,8 @@ Route::controller(\App\Http\Controllers\Api\AuthController::class)->group(functi
 Route::middleware('auth:sanctum')->group(function () {
     Route::resource('education', EducationController::class);
     Route::get('/profile/{id}', [UserController::class, 'profile']);
+    Route::get('/update/profile', [UserController::class, 'medcoins']);
     Route::get('/quiz', [QuizController::class, 'index']);
+    Route::post('/update/quiz', [QuizController::class, 'update']);
+    Route::get('/questions', [QuizController::class, 'questions']);
 });

@@ -27,26 +27,6 @@ class Quiz
                     'is_right_option' => $is_right
                 ];
             }
-        } elseif ($type == 'checkbox') {
-
-            foreach ($options as $key => $option) {
-                foreach($answers as $answer) {
-                    if ($key == $answer) {
-                        $is_right = 1; break;
-                    } else {
-                        $is_right = 0;
-                    }
-                }
-
-                $data[] = [
-                    'question_id' => $question->id,
-                    'option' => $option,
-                    'is_right_option' => $is_right
-                ];
-            }
-
-        } else if ($type == 'answer') {
-            return true;
         }
 
         $isSaved = Option::insert($data);
