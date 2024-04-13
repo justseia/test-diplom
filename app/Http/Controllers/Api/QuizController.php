@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Education;
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\User;
@@ -15,7 +16,7 @@ class QuizController extends Controller
     public function index()
     {
         $quizzes = Quiz::with('creator:id,name') // Adjust 'id,name' based on your author's table
-        ->select('id', 'title', 'author', 'questions_count', 'image_url')
+        ->select('id', 'title', 'author', 'code', 'questions_count', 'image_url')
             ->get();
 
         // Transform each quiz, including converting the author ID to an author name
@@ -25,6 +26,7 @@ class QuizController extends Controller
                 'title' => $quiz->title,
                 'author' => $quiz->creator->name ?? 'Unknown', // Fallback to 'Unknown' if not found
                 'questions_count' => $quiz->questions_count,
+                'code' => $quiz->code,
                 'image_url' => $quiz->image_url ? url($quiz->image_url) : null,
             ];
         });
@@ -38,7 +40,8 @@ class QuizController extends Controller
             $questions = Question::with('options')->where('quiz_id', $request->quiz_id)->get();
         } elseif (!empty($request->education_id)) {
             $questions = Question::with('options')->where('education_id', $request->education_id)->get();
-
+        } else {
+            return $this->sendError('Quiz or Education id required', 401);
         }
 
         $transformedQuestions = $questions->map(function ($question) {
