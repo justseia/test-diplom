@@ -9,6 +9,11 @@
             color: white;
         }
 
+        .default-state {
+            color: #3dbdf1;
+            background-color: white;
+        }
+
         .spanStyle {
             background-color: #3dbdf1;
             color: white;
@@ -20,7 +25,7 @@
         }
 
         label {
-            font-size: 25px;
+            font-size: 20px;
         }
 
         /* For WebKit browsers like Chrome, Safari, and Edge */
@@ -41,6 +46,8 @@
         /* Always show vertical scrollbar and ensure it's visible even if content doesn't overflow */
         .scrollable-div {
             overflow-y: scroll;
+            padding-right: 10px; /* Should be equal to or greater than the right padding of list-group-item for consistent alignment */
+
         }
 
         input[type="text"]::placeholder {
@@ -55,26 +62,37 @@
 
     @if(auth()->user()->can('manage_quiz'))
         <div class="container mt-4">
-            <div class="row" style="background-color: white">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Quizes List</h3>
+                </div>
+                <div class="col-6 bradius">
+                        <a href="{{ route('quiz.create') }}"
+                           class="btn btn-success pull-right bradius">Create quiz</a>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-4">
-                    <div class="mt-4 mb-3">
-                        <form method="GET" action="{{ route('search-user') }}">
-                            <div class="input-group">
-                                <input type="text" class="form-control bradius" placeholder="&#128269; Search"
-                                       style="font-family: Arial, 'Font Awesome 5 Free';">
-                            </div>
-                            {{ csrf_field() }}
-                        </form>
-                    </div>
-                    @if($quizzes->isEmpty())
-                        <p>No quizzes records found.</p>
-                    @else
-                        <div>
-                            <div class="list-group scrollable-div" style="height: 900px;">
+                    <div class="card card-body bradius" style="height: 900px">
+                        <div class="mt-4 mb-3">
+                            <form method="GET" action="{{ route('search-quiz') }}">
+                                <div class="input-group">
+                                    <input type="text" name="title" class="form-control bradius"
+                                           placeholder="&#128269; Search"
+                                           style="font-family: Arial, 'Font Awesome 5 Free';">
+                                </div>
+                                {{ csrf_field() }}
+                            </form>
+                        </div>
+                        @if($quizzes->isEmpty())
+                            <p>No quizzes records found.</p>
+                        @else
+                            <div class="list-group scrollable-div">
                                 @foreach($quizzes as $quiz)
-                                    <a href="javascript:void(0);"
-                                       class="list-group-item list-group-item-action{{ $loop->first ? ' active' : '' }} bradius mb-3 {{ $loop->first ? 'active-orange' : '' }}"
-                                       style="border-radius: 20px">
+                                    <a href="{{ route('quiz.index', ['id' => $quiz->id]) }}"
+                                       class="list-group-item list-group-item-action bradius mb-3 {{ $quiz->id === $selectedquiz->id ? 'active-orange' : 'default-state' }}"
+                                       style="border-radius: 20px; border: 1px solid black"
+                                       data-id="{{ $quiz->id }}">
                                         <div class="row">
                                             <div class="col-9">
                                                 <h5 class="mb-1">{{ $quiz->title ? $quiz->title : '' }}</h5>
@@ -83,24 +101,22 @@
                                                 <h5>{{$quiz->participants_count ?? ''}} participants</h5>
                                             </div>
                                             <div class="col-3">
-                                                <i class='fas fa-caret-square-right mt-5' style='font-size:36px'></i>
+                                                <i class='fa fa-angle-right mt-5 bradius {{ $quiz->id === $selectedquiz->id ? 'active-icon' : 'default-icon' }}'
+                                                   style='font-size:36px; border: 1px solid black; width: 40px; height: 40px; display: flex;
+           align-items: center; justify-content: center;'></i>
                                             </div>
                                         </div>
                                     </a>
                                 @endforeach
                             </div>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
                 <div class="col-md-8">
-                    <div class="card">
-                        <div class="x_title mt-2">
-                            <div class="row">
+                    <div class="card bradius"  style="height: 900px;">
+                        <div class="mt-2">
+                            <div class="row m-2">
                                 <div class="col-6"><h4>Quiz info</h4></div>
-                                <div class="col-6 bradius">
-                                    <a href="{{ route('quiz.create') }}"
-                                       class="btn btn-success pull-right bradius">Create quiz</a>
-                                </div>
                             </div>
                         </div>
                         @if(!is_null($selectedquiz))
@@ -108,8 +124,8 @@
                                 <div class="row">
                                     <div class="col-md-3">
                                         <img
-                                                src="{{ !empty($selectedquiz->image_url) ? asset('storage/' . $selectedquiz->image_url) : 'https://via.placeholder.com/150' }}"
-                                                alt="Quiz Avatar" class="img-thumbnail  mx-auto d-block">
+                                            src="{{ !empty($selectedquiz->image_url) ? asset('storage/' . $selectedquiz->image_url) : 'https://via.placeholder.com/150' }}"
+                                            alt="Quiz Avatar" class="img-thumbnail  mx-auto d-block">
                                     </div>
                                     <div class="col-md-9">
                                         <label for="name">Name</label>
@@ -131,13 +147,13 @@
                                     <div class="col-6">
                                         <div class="spanStyle text-white p-3 mb-3">
                                             Participants count
-                                            <h3>100</h3>
+                                            <h3>{{ $selectedquiz->participants_count}}</h3>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="spanStyle text-white p-3">
                                             Average score of participants
-                                            <h3>77%</h3>
+                                            <h3>{{ $selectedquiz->participants_average_score}}%</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -145,22 +161,40 @@
                                     <div class="col">
                                         <div class="spanStyle text-white p-3 mb-3">
                                             The champion of quiz
-                                            <h3>Armanov Arman, armanov.a@gmail.com</h3>
-                                            <h5>100% 12.03.2024</h5>
+                                            <h3>{{ $selectedquiz->champName}}</h3>
+                                            <h5>{{ $selectedquiz->champScore}}</h5>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-6">
                                         @if($selectedquiz->is_private == 0)
-                                            <div class="input-group mb-3">
-                                                <span class="spanStyle input-group-text">Public quiz</span>
-                                            </div>
+                                            <form action="{{ route('quiz.private') }}" method="POST"
+                                                  onsubmit="return confirm('Make private this quiz?');">
+                                                {{ csrf_field() }}
+                                                <div class="input-group mb-3">
+                                                    <input type="hidden" name="id" value="{{ $quiz->id }}"/>
+                                                    <input type="hidden" name="_method" value="post"/>
+                                                    <button type="submit" name="Public_quiz"
+                                                            class="btn btn-success bradius">Public quiz
+                                                    </button>
+                                                </div>
+                                            </form>
                                         @else
-                                            <div class="input-group mb-3">
-                                                <span class="input-group-text">Private quiz</span>
-                                                <input type="text" class="form-control" placeholder="XXXXXXXX">
-                                            </div>
+                                            <form action="{{ route('quiz.private') }}" method="POST"
+                                                  onsubmit="return confirm('Make public this quiz?');">
+                                                {{ csrf_field() }}
+                                                <div class="input-group mb-3">
+                                                    <input type="hidden" name="id" value="{{ $quiz->id }}"/>
+                                                    <input type="hidden" name="_method" value="post"/>
+                                                    <button type="submit" name="Private_quiz"
+                                                            class="btn btn-warning bradius">Private quiz
+                                                    </button>
+                                                    <input type="text" class="form-control bradius"
+                                                           placeholder="XXXXXXXX"
+                                                           value="{{$selectedquiz->code}}">
+                                                </div>
+                                            </form>
                                         @endif
                                     </div>
                                     <div class="col-6">
@@ -221,3 +255,18 @@
         @include('errors.401')
     @endif
 @stop
+<script>
+    function updateActiveRow(userId) {
+        // Remove active-orange from all elements
+        document.querySelectorAll('.list-group-item').forEach(function (item) {
+            item.classList.remove('active-orange');
+            item.classList.add('default-state');
+        });
+
+        // Find the new selected element and add active-orange
+        let selectedElement = document.querySelector(`a[data-id="${userId}"]`);
+        if (selectedElement) {
+            selectedElement.classList.add('active-orange');
+        }
+    }
+</script>

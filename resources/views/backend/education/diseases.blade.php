@@ -8,6 +8,7 @@
             background-color: #f0f0f0;
             cursor: pointer;
         }
+
         .image-preview {
             max-width: 100px;
             max-height: 100px;
@@ -17,29 +18,30 @@
 @stop
 
 @section('content')
-    <div class="card">
-        <div class="d-flex justify-content-start align-items-center m-3">
-            <a href="{{ route('education.index') }}" class="text-secondary mr-2">
-                <i class="fa fa-solid fa-arrow-left"></i>
-            </a>
-            <h2 class="h4"> {{ $diseases->title }}: diseases and images</h2>
-        </div>
+    <div class="d-flex justify-content-start align-items-center m-3">
+        <a href="{{ route('education.index') }}" class="text-secondary mr-2 mt-1">
+            <i class="fa fa-arrow-left" style="font-size: 20px"></i>
+        </a>
+        <h2 class="h4"> {{ $diseases->title }}: diseases and images</h2>
+    </div>
+    <div class="card bradius p-2">
         <h6 class="ml-3">Diseases information:</h6>
         <form method="POST" action="{{ route('education.store') }}" enctype="multipart/form-data" id="educationForm">
             @csrf
             <input type="hidden" name="id" value="{{ $diseases->id }}">
-            <textarea name="diseases" cols="30" rows="10" style="width: 100%; margin: 15px">{{ $diseases->diseases }}</textarea>
+            <textarea class="bradius" name="diseases" cols="30" rows="10"
+                      style="width: 100%; margin: 15px">{{ $diseases->diseases }}</textarea>
             <div class="ml-3 mb-3">
                 <h6>Images:</h6>
                 <div class="d-flex flex-wrap" id="imagePreviewContainer">
                     @foreach ($diseases_images as $image)
                         <div class="p-2">
-                            <img src="{{ asset('storage/' . $image->url) }}" alt="Image" class="image-preview">
+                            <img src="{{ asset('storage/' . $image->url) }}" alt="Image" class="image-preview bradius">
                         </div>
                     @endforeach
                 </div>
                 <div class="p-2">
-                    <div class="border bg-light d-flex justify-content-center align-items-center"
+                    <div class="border bg-light d-flex justify-content-center align-items-center bradius"
                          style="width: 100px; height: 100px; cursor: pointer;" id="uploadTrigger">
                         <span>+</span>
                         <input type="file" name="images[]" id="fileInput" style="display: none;" multiple/>

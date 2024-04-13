@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Models\Quiz;
 use App\Models\User;
+use App\Models\UserParticipant;
 use App\Models\UserQuestionAnswer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -74,8 +75,8 @@ class DashboardController extends Controller
             'newQuizzes' => Quiz::where('created_at', '>', now()->startOfMonth())->count(),
             'selectedMonth' => now()->format('F, Y'),
             'months' => $months,
-            'averageAge' => 20,
-            'averageScore' => 20,
+            'averageAge' => (int)User::avg('age'),
+            'averageScore' => (int)UserParticipant::avg('score'),
         ]);
     }
 }

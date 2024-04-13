@@ -20,14 +20,14 @@
 @section('content')
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="x_panel">
                 <div class="d-flex justify-content-start align-items-center m-3">
                     <a href="{{ route('quiz.index') }}" class="text-secondary mr-2">
                         <i class="fa fa-solid fa-arrow-left"></i>
                     </a>
                     <h2 class="h4"> Creating a new quiz</h2>
                 </div>
-                <div class="x_content">
+            <div class="card bradius">
+                <div class="card-body">
                     @include('backend.partials.error')
 
                     <form method="POST" action="{{ route('quiz.store') }}" enctype="multipart/form-data" id="quizForm">
@@ -41,9 +41,9 @@
                         <label for="images">Logo:</label>
                         <div class="d-flex flex-wrap" id="imagePreviewContainer"></div>
                         <div class="p-2">
-                            <div class="border bg-light d-flex justify-content-center align-items-center"
+                            <div class="border bg-light d-flex justify-content-center align-items-center bradius"
                                  style="width: 90px; height: 90px; cursor: pointer;" id="uploadTrigger">
-                                <span style="font-size: 70px">+</span>
+                                <span style="font-size: 60px">+</span>
                                 <input type="file" name="images" id="fileInput" style="display: none;"/>
                             </div>
                         </div>

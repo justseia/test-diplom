@@ -53,4 +53,15 @@ class User extends Authenticatable
         return $this->belongsToMany(Quiz::class, 'user_participants')->withPivot('score', 'participation_status');
     }
 
+    public function participants()
+    {
+        return $this->hasMany(UserParticipant::class, 'user_id');
+    }
+
+    // Add a new method for passed quizzes
+    public function passedQuizzes()
+    {
+        return $this->hasMany(UserParticipant::class, 'user_id')->where('score', '>', 50);
+    }
+
 }

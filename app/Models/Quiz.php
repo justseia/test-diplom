@@ -23,7 +23,7 @@ class Quiz extends Model
 
     public function participants()
     {
-        return $this->belongsToMany(User::class, 'user_participants')->withPivot('score', 'participation_status');
+        return $this->hasMany(UserParticipant::class, 'quiz_id');
     }
 
 }

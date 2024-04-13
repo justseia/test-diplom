@@ -25,7 +25,7 @@
 
 <body class="nav-md">
     <div class="container body">
-        <div class="main_container">
+        <div class="main_container" style="background-color: #e5e4e4">
 
 			<div class="col-md-3 left_col">
                 @include('backend.partials.sidebar-menu')
@@ -38,22 +38,11 @@
             <!-- /top navigation -->
 
 			<!-- page content -->
-            <div class="right_col" role="main">
-                <div class="" style="background-color: lightgray">
-
+            <div class="right_col" role="main" style="background-color: #e5e4e4">
+                <div class="">
                     @yield('content')
                 </div>
             </div>
-            <!-- /page content -->
-            <!-- footer content -->
-            <footer>
-                <div class="pull-right">
-                    ©
-                    <?php echo(date('Y')) ?>. Quiz
-                </div>
-                <div class="clearfix"></div>
-            </footer>
-            <!-- /footer content -->
         </div>
     </div>
     <!-- jQuery -->

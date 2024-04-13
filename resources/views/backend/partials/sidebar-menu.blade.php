@@ -1,13 +1,9 @@
 <div class="left_col scroll-view">
     <div>
-        <div class="navbar" style="border: 0;">
+        <div class="navbar mb-4" style="border: 0;">
             <a href="{{ route('dashboard') }}" class="site_title">
-                <img src="{{asset('images/body_genuis.png')}}" alt="" width="200px" height="100px">
+                <img src="{{asset('images/body_genuis.png')}}" alt="" width="150px" height="150/1.26px">
             </a>
-        </div>
-
-        <div class="navbar" style="margin-left: 20%; border: 0;">
-            <span style="font-size: x-large">{{ env('APP_NAME')}}</span>
         </div>
     </div>
     <br/>
@@ -24,13 +20,6 @@
                 @if( Auth::user()->can('manage_user'))
 {{--                    <li><a href="{{ route('user.index') }}"><i class="fa fa-user"></i> All User </a></li>--}}
                     <li><a href="{{ route('user.getUsers') }}"><i class="fa fa-user-circle"></i> User List </a></li>
-
-{{--                    <li><a><i class="fa fa-edit"></i> User Management <span class="fa fa-chevron-down"></span></a>--}}
-{{--                        <ul class="nav child_menu">--}}
-{{--                            <li><a href="{{ route('user.index') }}">All Users</a></li>--}}
-{{--                            <li><a href="{{ route('user.create') }}">Register User</a></li>--}}
-{{--                        </ul>--}}
-{{--                    </li>--}}
                 @endif
 
                 <li><a href="{{ route('quiz.index') }}"><i class="fa fa-question-circle" aria-hidden="true"></i>
@@ -43,6 +32,17 @@
             </ul>
         </div>
     </div>
-    <!-- /sidebar menu -->
+    <div class="logout-button-container" style="position: absolute; bottom: 0; width: 100%; text-align: center; padding: 10px 0;">
+        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+           class="btn btn-default" style="width: 90%; margin: 0 auto;">
+            <span class="glyphicon glyphicon-log-out" style="font-size: 18px"></span> Log out
+        </a>
+    </div>
+
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+
+
 
 </div>

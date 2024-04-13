@@ -24,7 +24,12 @@ class DatabaseSeeder extends Seeder
             RolesTableSeeder::class,
             ModelHasRolesTableSeeder::class,
             PermissionsTableSeeder::class,
-            UsersAdditionalTableSeeder::class
+            UsersAdditionalTableSeeder::class,
+            QuizzesTableSeeder::class,
+            QuestionsTableSeeder::class,
+            OptionsTableSeeder::class,
+            UserParticipantsTableSeeder::class,
+            EducationTableSeeder::class,
         ]);
     }
 }

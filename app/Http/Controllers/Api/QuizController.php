@@ -87,4 +87,11 @@ class QuizController extends Controller
             return $this->sendError('Error', 403);
         }
     }
+
+    public function getByCode($code)
+    {
+        $quiz = Quiz::where('code', $code)->first();
+        $id = $quiz->id ?? 0;
+        return response()->json($id);
+    }
 }

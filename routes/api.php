@@ -26,7 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('education', EducationController::class);
     Route::get('/profile/{id}', [UserController::class, 'profile']);
     Route::get('/update/profile', [UserController::class, 'medcoins']);
+    Route::post('/user/update/{id}', [UserController::class, 'update'])->name('user.update');
     Route::get('/quiz', [QuizController::class, 'index']);
+    Route::get('/quiz/{code}', [QuizController::class, 'getByCode']);
     Route::post('/update/quiz', [QuizController::class, 'update']);
     Route::get('/questions', [QuizController::class, 'questions']);
 });

@@ -11,6 +11,16 @@ class Question extends Model
 
     protected $table = 'questions';
 
+    protected $primaryKey = 'id';
+
+    protected $fillable = [
+        'id'
+    ];
+    public function education()
+    {
+        return $this->belongsTo(Education::class, 'education_id');
+    }
+
     public function options() {
         return $this->hasMany(related: Option::class, foreignKey: 'question_id', localKey: 'id');
     }

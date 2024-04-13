@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Backend;
 
+use App\Models\Quiz;
 use App\Models\User;
+use App\Models\UserParticipant;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
@@ -25,24 +27,59 @@ class UserController extends Controller
         return view('backend.users.index')->with('users', $users);
     }
 
-    public function getUsers()
+    public function getUsers(Request $request)
     {
         $users = User::role('User')->orderBy('updated_at', 'desc')->paginate(20);
-        $selectedUser = $users->first(); // As an example, select the first user
-        return view('backend.users.indexUsers')->with( [
+        if (!empty($request->id)) {
+            $selectedUser = $users->where('id', $request->id)->first(); // As an example, select the first user
+        } else {
+            $selectedUser = $users->first(); // As an example, select the first user
+        }
+        $selectedUser->average_score = (int)UserParticipant::where('user_id', $selectedUser->id)->avg('score');
+        $selectedUser->passed_quizzes = (int)UserParticipant::where('user_id', $selectedUser->id)->count();
+        return view('backend.users.indexUsers')->with([
             'users' => $users,
             'selectedUser' => $selectedUser
         ]);
     }
-    public function getTeachers()
+
+    public function getTeachers(Request $request)
     {
         $users = User::role('Teacher')->orderBy('updated_at', 'desc')->paginate(20);
-        $selectedUser = $users->first(); // As an example, select the first user
-        return view('backend.users.indexTeachers')->with( [
+        if (!empty($request->id)) {
+            $selectedUser = $users->where('id', $request->id)->first(); // As an example, select the first user
+        } else {
+            $selectedUser = $users->first(); // As an example, select the first user
+        }
+
+        $passingScore = 0;
+
+        $totalPassedStudents = Quiz::where('author', $selectedUser->id)
+            ->withCount(['participants' => function ($query) use ($passingScore) {
+                $query->where('score', '>=', $passingScore);
+            }])
+            ->get()
+            ->sum('participants_count');
+
+
+        $quizzes = Quiz::where('author', $selectedUser->id)->with('participants')->get();
+
+        $overallAverageScore = $quizzes->pluck('participants')
+            ->flatten() // Flatten the collection of collections
+            ->avg('score'); // Directly compute the average of scores from all participants of all quizzes
+
+        $publicQuizzesCount = Quiz::where('is_private', false)->where('author', $selectedUser->id)->count();
+
+        $selectedUser->totalPassedStudents = (int)$totalPassedStudents;
+        $selectedUser->averageScores = (int)$overallAverageScore;
+        $selectedUser->publicQuizzesCount = (int)$publicQuizzesCount;
+
+        return view('backend.users.indexTeachers')->with([
             'users' => $users,
             'selectedUser' => $selectedUser
         ]);
     }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -63,16 +100,16 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name'     =>'required|max:120',
-            'email'    =>'required|email|unique:users',
-            'age'    =>'required',
-            'password' =>'required|min:5|confirmed'
+            'name' => 'required|max:120',
+            'email' => 'required|email|unique:users',
+            'age' => 'required',
+            'password' => 'required|min:5|confirmed'
         ]);
 
         $path = null;
@@ -83,7 +120,7 @@ class UserController extends Controller
             // You can also validate the file here (e.g., size, mime types)
 
             // Generate a unique file name to prevent overwriting
-            $fileName = time().'.'.$file->getClientOriginalExtension();
+            $fileName = time() . '.' . $file->getClientOriginalExtension();
 
             // Save the file to your desired location, 'public' could be any disk defined in your filesystems.php config
             $path = $file->storeAs('images', $fileName, 'public');
@@ -94,49 +131,49 @@ class UserController extends Controller
         }
 
         $user = User::create([
-                                'urlAvatar' => $path,
-                                'name' => $request->name,
-                                'email' => $request->email,
-                                'age' => $request->age,
-                                'aboutMe' => $request->aboutMe,
-                                'password' => bcrypt($request->password)
-                            ]);
+            'urlAvatar' => $path,
+            'name' => $request->name,
+            'email' => $request->email,
+            'age' => $request->age,
+            'aboutMe' => $request->aboutMe,
+            'password' => bcrypt($request->password)
+        ]);
 
-        $role    = $request->role;
+        $role = $request->role;
         $my_role = Role::where('id', '=', $role)->firstOrFail();
 
         $user->assignRole($my_role); //Assigning role to user
 
-       //  flash('User successfully added!')->success();
+        //  flash('User successfully added!')->success();
         return redirect()->route('user.getUsers');
     }
 
     public function storeTeacher(Request $request)
     {
         $this->validate($request, [
-            'name'     =>'required|max:120',
-            'email'    =>'required|email|unique:users',
-            'password' =>'required|min:5'
+            'name' => 'required|max:120',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:5'
         ]);
 
         $user = User::create([
-                                'name' => $request->name,
-                                'email' => $request->email,
-                                'password' => bcrypt($request->password)
-                            ]);
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password)
+        ]);
 
         $my_role = Role::where('id', '=', 2)->firstOrFail();
 
         $user->assignRole($my_role); //Assigning role to user
 
-       //  flash('User successfully added!')->success();
+        //  flash('User successfully added!')->success();
         return redirect()->route('user.getTeachers');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -147,7 +184,7 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -162,8 +199,8 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -171,13 +208,13 @@ class UserController extends Controller
 
         //Validate name, email and password fields
         $this->validate($request, [
-            'name'     =>'required',
-            'email'    =>'required|email|unique:users,email,'.$id,
-            'admin_password' =>'required'
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'admin_password' => 'required'
         ]);
 
         //check admin password
-        if ( ! \Hash::check($request->admin_password, Auth::user()->password)) {
+        if (!\Hash::check($request->admin_password, Auth::user()->password)) {
 
             return redirect()->back()->with('error', 'Wrong admin password.');
         }
@@ -209,23 +246,28 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
         $user = User::findOrFail($id);
-        $user->delete();
+        $user->blocked = $user->blocked ? 0 : 1;
+        $user->save();
 
-        return redirect()->route('user.index')->with('success', 'User successfully deleted.');
+        if ($user->role('User')) {
+            return redirect()->route('user.getUsers')->with('success', 'User successfully deleted.');
+        } elseif ($user->role('Teacher')) {
+            return redirect()->route('user.getTeachers')->with('success', 'User successfully deleted.');
+        }
     }
 
 
     /**
      * update user permissions
      *
-     * @param  mixed $request
-     * @param  mixed $id
+     * @param mixed $request
+     * @param mixed $id
      * @return void
      */
     public function updatePermission(Request $request, $id)
@@ -235,10 +277,10 @@ class UserController extends Controller
 
         //Validate name, email and password fields
         $this->validate($request, [
-            'admin_password' =>'required'
+            'admin_password' => 'required'
         ]);
 
-        if ( ! \Hash::check($request->admin_password, Auth::user()->password)) {
+        if (!\Hash::check($request->admin_password, Auth::user()->password)) {
 
             return redirect()->back()->with('error', 'Wrong admin password.');
         }

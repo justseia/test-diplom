@@ -13,6 +13,10 @@ class Education extends Model
       'title', 'info', 'diseases'
     ];
 
+    public function questions()
+    {
+        return $this->hasMany(Question::class, 'education_id');
+    }
     public function images()
     {
         $this->hasMany(EducationImages::class,'education_id','id');

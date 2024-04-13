@@ -1,91 +1,151 @@
-<form method="POST" action="{{ route('quiz.edit', $quiz->id) }}" class="">
+<style>
+    .form-check {
+        width: 700px;
+        margin-top: 10px;
+    }
 
-    <div class="row input_row">
+    #uploadTrigger:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
+
+    .image-preview {
+        max-width: 100px;
+        max-height: 100px;
+        margin-right: 1px;
+    }
+</style>
+<form method="POST" action="{{ route('save.question', $quiz->id) }}" enctype="multipart/form-data" id="questionForm">
+
+    <div class="row">
         <div class="col-md-12">
             <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12">Question <span class="required">*</span></label>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" name="question" required="required" placeholder="Enter your question" class="form-control">
-
+                <label class="control-label col-md-2 col-sm-2 col-xs-12">Question:</label>
+                <div class="col-12">
+                    <input type="text" name="question" required="required" placeholder="Enter your question"
+                           class="form-control bradius" value="{{$question->question ?? ''}}">
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="row input_row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12">Option 1 </label>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" name="options[]" placeholder="Option 1" class="form-control">
+    <div>
+        @empty($question)
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="answerOptions" id="option1" value="0" checked>
+                <input type="text" name="options[]" placeholder="Write option answer" class="form-control bradius">
+            </div>
+            <br>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="answerOptions" id="option2" value="1">
+                <input type="text" name="options[]" placeholder="Write option answer" class="form-control bradius">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="answerOptions" id="option3" value="2">
+                <input type="text" name="options[]" placeholder="Write option answer" class="form-control bradius">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="answerOptions" id="option4" value="3">
+                <input type="text" name="options[]" placeholder="Write option answer" class="form-control bradius">
+            </div>
+        @else
+            @foreach($question->options as $key => $option)
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="answerOptions" id="option{{$key}}"
+                           value="{{ $key }}" {{ $option->is_right_option === 1 ? 'checked' : '' }}>
+                    <label style="width: 100%" for="option{{$key}}">
+                        <input type="text" name="options[{{ $key }}]" placeholder="Write option answer"
+                               class="form-control bradius"
+                               value="{{$option->option}}">
+                    </label>
                 </div>
+            @endforeach
+
+        @endif
+    </div>
+    <div class="m-3">
+        <label for="images">Image:</label>
+        <div class="d-flex flex-wrap" id="imagePreviewContainer">
+            @if(!empty($question->image_url))
+                <div class="position-relative">
+                    <img src="{{ $question->image_url }}" class="image-preview">
+                    <i class="fa fa-times-circle position-absolute top-0 end-0" aria-hidden="true"
+                       onclick="removeImage(this)" style="font-size: 20px; color: red"></i>
+                </div>
+            @endif
+        </div>
+        <div class="p-2">
+            <div class="border bg-light d-flex justify-content-center align-items-center bradius"
+                 style="width: 90px; height: 90px; cursor: pointer;" id="uploadTrigger">
+                <span style="font-size: 60px">+</span>
+                <input type="file" name="images" id="fileInput" style="display: none;"/>
             </div>
         </div>
     </div>
-
-    <div class="row input_row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12">Option 2 </label>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" name="options[]" placeholder="Option 2 " class="form-control">
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row input_row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12">Option 3 </label>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" name="options[]" placeholder="Option 2 " class="form-control">
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row input_row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12">Option 4 </label>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" name="options[]" placeholder="Option 4 " class="form-control">
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row input_row">
-        <div class="col-md-12">
-            <div class='form-group'>
-                <label class="control-label col-md-2 col-sm-2 col-xs-12">Correct Answer <span class="required">*</span></label>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <div class="radio">
-                        <label>
-                            <input type="radio" value="0" name="answer" id="option1"> <label for="option1">Option 1</label> &nbsp; &nbsp;
-                            <input type="radio" value="1" name="answer" id="option2"> <label for="option2">Option 2</label> &nbsp; &nbsp;
-                            <input type="radio" value="2" name="answer" id="option3"> <label for="option3">Option 3</label> &nbsp; &nbsp;
-                            <input type="radio" value="3" name="answer" id="option4"> <label for="option4">Option 4</label> &nbsp; &nbsp;
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <hr>
-    <div class="row input_row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-2">
-                    {{ csrf_field() }}
-                    <input type="hidden" name="type" value="{{ $type }}">
-                    <button type="submit" class="btn btn-success">Submit</button>
-                    <a href="{{ route('user.index') }}" class="btn btn-default">Cancel</a>
-                </div>
-            </div>
-        </div>
+    @empty($question)
+        <input type="hidden" name="id" value="0">
+    @else
+        <input type="hidden" name="id" value="{{$question->id}}">
+    @endempty
+    {{ csrf_field() }}
+    <div class="d-grid">
+        <button class="btn btn-success bradius float-right" type="button" id="saveButton">Save</button>
     </div>
 </form>
+<script>
+    function removeImage(element) {
+        // This will remove the image container div
+        element.parentNode.remove();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Trigger file input when "+" icon is clicked
+        document.getElementById('uploadTrigger').addEventListener('click', function () {
+            document.getElementById('fileInput').click();
+        });
+
+        // Submit form when save button is clicked
+        document.getElementById('saveButton').addEventListener('click', function () {
+            document.getElementById('questionForm').submit();
+        });
+
+        let uploadedFiles = []; // Array to store uploaded files
+
+        // Function to display uploaded images as thumbnails
+        function displayImagePreview(file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                imagePreviewContainer.innerHTML = ''; // Clear the container
+                const div = document.createElement('div');
+                div.classList.add('position-relative');
+
+                const imgElement = document.createElement('img');
+                imgElement.classList.add('image-preview');
+                imgElement.src = e.target.result;
+
+                const iClose = document.createElement('i');
+                iClose.classList.add('fa', 'fa-times-circle', 'position-absolute', 'top-0', 'end-0');
+                iClose.setAttribute('aria-hidden', 'true');
+                iClose.onclick = function() { removeImage(iClose); };
+                iClose.style.fontSize = '20px';
+                iClose.style.cursor = 'pointer';
+                iClose.style.color = 'red';
+
+                div.appendChild(imgElement);
+                div.appendChild(iClose);
+                imagePreviewContainer.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        }
+
+
+        // Handle file input change event
+        document.getElementById('fileInput').addEventListener('change', function (event) {
+            const file = event.target.files[0]; // Get the first file only
+            if (file) {
+                uploadedFile = file; // Update the uploadedFile variable
+                displayImagePreview(file);
+            }
+        });
+    });
+</script>

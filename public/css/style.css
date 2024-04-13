@@ -17,3 +17,12 @@
 .bradius {
     border-radius: 10px
 }
+.active-icon {
+    background-color: white !important; /* Use !important to override inline styles if necessary */
+    color: orange !important;
+}
+
+.default-icon {
+    background-color: #49c4f8; /* Your default blue color */
+    color: white;
+}

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('image_url')->nullable();
             $table->tinyInteger('is_active')->default(1);
             $table->tinyInteger('is_private')->default(0);
-            $table->string('code')->nullable();
+            $table->string('code')->unique();
             $table->timestamps();
         });
     }

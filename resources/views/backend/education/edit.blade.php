@@ -1,6 +1,6 @@
 @extends('backend.layouts.default')
 
-@section('page_title', 'Manage Quiz')
+@section('page_title', 'Manage Education')
 
 @section('style')
     <style>
@@ -46,15 +46,15 @@
             <div class="row">
                 <div class="col-8">
                     <div class="d-flex justify-content-start align-items-center">
-                        <a href="{{ route('quiz.index', ['id' => $quiz->id]) }}" class="text-secondary mr-2">
+                        <a href="{{ route('education.index', ['id' => $education->id]) }}" class="text-secondary mr-2">
                             <i class="fa fa-solid fa-arrow-left"></i>
                         </a>
-                        <h2 class="h4"> {{ $quiz->title }} : </h2>
+                        <h2 class="h4"> {{ $education->title }} : </h2>
                         <span style="font-size: 25px; margin-left: 5px"> questions: {{$questions->count()}}</span>
 
                     </div>
                 </div>
-                <div class="col-4"><a href="{{ route('create.question',['id'=>0, 'quiz_id' => $quiz->id]) }}"
+                <div class="col-4"><a href="{{ route('education.create.question',['id'=>0, 'education_id' => $education->id]) }}"
                                       class="btn btn-success pull-right bradius">Add question</a></div>
             </div>
         </div>
@@ -88,17 +88,17 @@
                     <div class="col-2">
                         <div class="row">
                             <div class="col-4">
-                                <a href="{{ route('create.question',['id'=>$question->id, 'quiz_id' => $quiz->id]) }}"
+                                <a href="{{ route('education.create.question',['id'=>$question->id, 'education_id' => $education->id]) }}"
                                    class="btn btn-info bradius border-0">
                                     <i class='fas fa-pen' style='font-size:22px; color: black'></i>
                                 </a>
                             </div>
                             <div class="col-4">
-                                <form action="{{ route('delete.question') }}" method="POST"
+                                <form action="{{ route('education.delete.question') }}" method="POST"
                                       onsubmit="return confirm('Delete this record?');">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="id" value="{{ $question->id }}"/>
-                                    <input type="hidden" name="quizID" value="{{ $quiz->id }}"/>
+                                    <input type="hidden" name="educationID" value="{{ $education->id }}"/>
                                     <input type="hidden" name="_method" value="DELETE"/>
                                     <button class="btn btn-danger bradius border-0">
                                         <i class='fas fa-trash' style='font-size:22px; color: white'></i>
