@@ -10,8 +10,9 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function profile($id)
+    public function profile()
     {
+        $id = auth()->id();
         $user = User::select(
             'id',
             'urlAvatar',

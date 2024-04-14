@@ -16,7 +16,7 @@ class QuizController extends Controller
     public function index()
     {
         $quizzes = Quiz::with('creator:id,name') // Adjust 'id,name' based on your author's table
-        ->select('id', 'title', 'author', 'code', 'questions_count', 'image_url')
+        ->select('id', 'title', 'author', 'code', 'questions_count', 'image_url')->where('is_private',0)
             ->get();
 
         // Transform each quiz, including converting the author ID to an author name

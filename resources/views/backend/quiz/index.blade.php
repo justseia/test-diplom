@@ -173,7 +173,7 @@
                                                   onsubmit="return confirm('Make private this quiz?');">
                                                 {{ csrf_field() }}
                                                 <div class="input-group mb-3">
-                                                    <input type="hidden" name="id" value="{{ $quiz->id }}"/>
+                                                    <input type="hidden" name="id" value="{{ $selectedquiz->id }}"/>
                                                     <input type="hidden" name="_method" value="post"/>
                                                     <button type="submit" name="Public_quiz"
                                                             class="btn btn-success bradius">Public quiz
@@ -185,7 +185,7 @@
                                                   onsubmit="return confirm('Make public this quiz?');">
                                                 {{ csrf_field() }}
                                                 <div class="input-group mb-3">
-                                                    <input type="hidden" name="id" value="{{ $quiz->id }}"/>
+                                                    <input type="hidden" name="id" value="{{ $selectedquiz->id }}"/>
                                                     <input type="hidden" name="_method" value="post"/>
                                                     <button type="submit" name="Private_quiz"
                                                             class="btn btn-warning bradius">Private quiz

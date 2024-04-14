@@ -34,7 +34,11 @@ class QuizController extends Controller
      */
     public function index(Request $request)
     {
-        $quizs = $this->quiz->with('creator')->withCount('participants')->get();
+        if ($request->user()->hasRole('Super Admin')) {
+            $quizs = $this->quiz->with('creator')->withCount('participants')->get();
+        } else {
+            $quizs = $this->quiz->where('author', auth()->id())->with('creator')->withCount('participants')->get();
+        }
         if ($request->id) {
             $selectedquiz = $quizs->where('id', $request->id)->first();
         } else {
@@ -211,6 +215,14 @@ class QuizController extends Controller
 
     }
 
+    public function private(Request $request)
+    {
+        $quiz = Quiz::find($request->id);
+        $quiz->is_private = $quiz->is_private ? 0 : 1;
+        $quiz->update();
+        return redirect()->route('quiz.index', ['id' => $request->id]);
+    }
+
     public function createQuestion($id, $quiz_id)
     {
         $question = [];
@@ -251,7 +263,7 @@ class QuizController extends Controller
             $file = $request->file('images');
 
             // Generate a unique file name or you can keep the original one
-            $fileName = uniqid('question_').'.'.$file->getClientOriginalExtension();
+            $fileName = uniqid('question_') . '.' . $file->getClientOriginalExtension();
 
             // Save the file to the local storage and get the path
             $filePath = $file->storeAs($destinationPath, $fileName, 'public');

@@ -34,7 +34,6 @@
                 <input class="form-check-input" type="radio" name="answerOptions" id="option1" value="0" checked>
                 <input type="text" name="options[]" placeholder="Write option answer" class="form-control bradius">
             </div>
-            <br>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="answerOptions" id="option2" value="1">
                 <input type="text" name="options[]" placeholder="Write option answer" class="form-control bradius">

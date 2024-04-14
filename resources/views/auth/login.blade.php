@@ -1,34 +1,13 @@
 @extends('layouts.app')
 <style>
-    .form-control, .btn {
-        border-radius: 30px; /* Makes the inputs and button oval */
-    }
-
     .login-image {
         display: block;
         margin-left: auto;
         margin-right: auto;
-        width: 20%; /* Adjust the width as needed */
-        height: 20%;
-    }
-
-    .btn-block {
-        display: block;
-        width: 100px; /* Adjust the width as needed */
-        margin: 0 auto; /* Center the button */
     }
 
     .password-wrapper {
         position: relative;
-    }
-
-    #password {
-        width: 100%;
-        padding-right: 30px; /* Make space for the eye icon */
-        font-size: 16px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
     }
 
     .toggle-password {
@@ -39,64 +18,84 @@
         cursor: pointer;
         font-size: 18px;
     }
+
+    input.custom-input {
+        display: block;
+        width: 100%; /* Full width */
+        padding: 0.375rem 0.75rem; /* Padding similar to form-control */
+        font-size: 1rem; /* Font size */
+        font-weight: 400; /* Font weight */
+        line-height: 1.5; /* Line height */
+        color: #212529; /* Text color */
+        background-color: #fff; /* Background color */
+        background-clip: padding-box; /* Background properties */
+        border: 1px solid black; /* Border properties */
+        appearance: none; /* Standardizing appearance across browsers */
+        border-radius: 20px; /* Border radius */
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out; /* Transition for interaction */
+    }
+
+    input.custom-input:focus {
+        color: #212529;
+        background-color: #fff;
+        border-color: #fff;
+        outline: 0;
+        box-shadow: #fff;
+    }
+
+
+    .password-toggle-icon i {
+        font-size: 18px;
+        line-height: 1;
+        color: #333;
+        transition: color 0.3s ease-in-out;
+        margin-bottom: 20px;
+    }
+
+    .password-toggle-icon i:hover {
+        color: #000;
+    }
 </style>
 
 @section('content')
     <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="mb-4 align-items-center">
-
-                            <img src="{{ asset('images/avatar.png') }}" alt="Login Illustration"
-                                 class="login-image img-fluid">
-                        </div>
-
-                        {{-- Login form --}}
-                        <form method="POST" action="{{ route('login') }}">
-                            @csrf
-
-                            {{-- Email field --}}
-                            <div class="form-group">
-                                <label for="email">Почта</label>
-                                <input id="email" type="email"
-                                       class="form-control @error('email') is-invalid @enderror" name="email"
-                                       value="{{ old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
-                                <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            {{-- Password field --}}
-                            <div class="form-group">
-                                <label for="password">Пароль</label> <br>
-                                <div class="password-wrapper">
-                                    <input id="password" type="password"
-                                           class="form-control @error('password') is-invalid @enderror"
-                                           name="password" required autocomplete="current-password">
-                                    <span id="togglePassword" class="toggle-password">
-                                        🚫️
-                                    </span>
-                                </div>
-                                @error('password')
-                                <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            {{-- Submit button --}}
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-primary btn-block">{{ __('Войти') }}</button>
-                            </div>
-
-                        </form>
-                    </div>
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6 mt-5">
+                <div class="align-items-center">
+                    <img src="{{ asset('images/body_genuis.png') }}" alt="Login Illustration"
+                         class="login-image img-fluid" style="width: 350px; height: 300px">
                 </div>
+
+                {{-- Login form --}}
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+                    <h5>Почта</h5>
+                    <input id="email" name="email" type="email" class="custom-input" placeholder="email" required autofocus>
+
+                    @error('email')
+                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                    @enderror
+                    <br>
+                    <h5>Пароль</h5>
+                    <div class="password-wrapper">
+                        <input id="password" type="password" name="password" class="custom-input" placeholder="password" required autofocus>
+                        <span id="togglePassword" class="toggle-password">
+                                        <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                                    </span>
+                    </div>
+                    @error('password')
+                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                    @enderror
+                    <br>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn" style="width: 300px; background-color: #18b0e8;
+                         color: white; border-radius: 20px">Войти</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -114,8 +113,14 @@
                     passwordInput.setAttribute('type', type);
 
                     // Optionally, change the eye icon or text
-                    this.textContent = this.textContent === '👁️' ? '🚫' : '👁️';
-                });
+                    const icon = this.querySelector('i');
+                    if (icon.classList.contains('fa-eye-slash')) {
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    } else {
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    }                });
             }
         });
     </script>
