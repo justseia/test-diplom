@@ -315,4 +315,19 @@ class QuizController extends Controller
 
         return redirect()->route('quiz.edit', $request->quizID);
     }
+    public function updateImage(Request $request, $id)
+    {
+        $quiz = Quiz::find($id);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->store('public');
+            $fileName = basename($path);
+            $quiz->image_url = $fileName;
+            $quiz->save();
+            return response()->json(['success' => 'Image updated successfully', 'image_url' => $quiz->image_url]);
+        }
+
+        return response()->json(['error' => 'No image uploaded']);
+    }
 }

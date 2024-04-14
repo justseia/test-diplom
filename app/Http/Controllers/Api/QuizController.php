@@ -16,7 +16,7 @@ class QuizController extends Controller
     public function index()
     {
         $quizzes = Quiz::with('creator:id,name') // Adjust 'id,name' based on your author's table
-        ->select('id', 'title', 'author', 'code', 'questions_count', 'image_url')->where('is_private',0)
+        ->select('id', 'title', 'author', 'code', 'questions_count', 'image_url')->where('is_private', 0)
             ->get();
 
         // Transform each quiz, including converting the author ID to an author name
@@ -27,7 +27,7 @@ class QuizController extends Controller
                 'author' => $quiz->creator->name ?? 'Unknown', // Fallback to 'Unknown' if not found
                 'questions_count' => $quiz->questions_count,
                 'code' => $quiz->code,
-                'image_url' => $quiz->image_url ? url($quiz->image_url) : null,
+                'image_url' => $quiz->image_url ? url('storage/' . $quiz->image_url) : null,
             ];
         });
 
@@ -93,8 +93,22 @@ class QuizController extends Controller
 
     public function getByCode($code)
     {
-        $quiz = Quiz::where('code', $code)->first();
-        $id = $quiz->id ?? 0;
-        return response()->json($id);
+        $quizzes = Quiz::with('creator:id,name') // Adjust 'id,name' based on your author's table
+        ->select('id', 'title', 'author', 'code', 'questions_count', 'image_url')
+            ->where('code', $code)->get();
+
+        // Transform each quiz, including converting the author ID to an author name
+        $transformedQuizzes = $quizzes->map(function ($quiz) {
+            return [
+                'id' => $quiz->id,
+                'title' => $quiz->title,
+                'author' => $quiz->creator->name ?? 'Unknown', // Fallback to 'Unknown' if not found
+                'questions_count' => $quiz->questions_count,
+                'code' => $quiz->code,
+                'image_url' => $quiz->image_url ? url($quiz->image_url) : null,
+            ];
+        });
+
+        return response()->json($transformedQuizzes);
     }
 }

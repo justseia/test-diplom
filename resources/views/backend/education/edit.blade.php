@@ -41,29 +41,23 @@
 @stop
 
 @section('content')
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-8">
-                    <div class="d-flex justify-content-start align-items-center">
-                        <a href="{{ route('education.index', ['id' => $education->id]) }}" class="text-secondary mr-2">
-                            <i class="fa fa-solid fa-arrow-left"></i>
-                        </a>
-                        <h2 class="h4"> {{ $education->title }} : </h2>
-                        <span style="font-size: 25px; margin-left: 5px"> questions: {{$questions->count()}}</span>
+    <div class="row">
+        <div class="col-8">
+            <div class="d-flex justify-content-start align-items-center">
+                <a href="{{ route('education.index', ['id' => $education->id]) }}" class="text-secondary mr-2">
+                    <i class="fa fa-solid fa-arrow-left"></i>
+                </a>
+                <h2 class="h4"> {{ $education->title }} : </h2>
+                <span style="font-size: 25px; margin-left: 5px"> questions: {{$questions->count()}}</span>
 
-                    </div>
-                </div>
-                <div class="col-4"><a href="{{ route('education.create.question',['id'=>0, 'education_id' => $education->id]) }}"
-                                      class="btn btn-success pull-right bradius">Add question</a></div>
             </div>
         </div>
+        <div class="col-4"><a href="{{ route('education.create.question',['id'=>0, 'education_id' => $education->id]) }}"
+                              class="btn btn-success pull-right bradius">Add question</a></div>
     </div>
-    <hr>
-    <div class="card">
-        @include('backend.partials.error')
+    <div class="card card-body" style="border-radius: 20px">
         @foreach ($questions as $key => $question)
-            <div class="card card-body">
+            <div class="card card-body bradius mb-2" style="border: 1px solid black">
                 <div class="row input_row">
                     <div class="col-md-12">
                         <div class="form-group">
@@ -86,11 +80,11 @@
                         @endforeach
                     </div>
                     <div class="col-2">
-                        <div class="row">
+                        <div class="row float-right">
                             <div class="col-4">
                                 <a href="{{ route('education.create.question',['id'=>$question->id, 'education_id' => $education->id]) }}"
-                                   class="btn btn-info bradius border-0">
-                                    <i class='fas fa-pen' style='font-size:22px; color: black'></i>
+                                   class="btn bradius border-0" style="background-color: #32d9f6">
+                                    <i class='fas fa-pen' style='font-size:16px; color: black'></i>
                                 </a>
                             </div>
                             <div class="col-4">
@@ -101,7 +95,7 @@
                                     <input type="hidden" name="educationID" value="{{ $education->id }}"/>
                                     <input type="hidden" name="_method" value="DELETE"/>
                                     <button class="btn btn-danger bradius border-0">
-                                        <i class='fas fa-trash' style='font-size:22px; color: white'></i>
+                                        <i class='fas fa-trash' style='font-size:16px; color: white'></i>
                                     </button>
                                 </form>
                             </div>

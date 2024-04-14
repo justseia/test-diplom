@@ -41,29 +41,23 @@
 @stop
 
 @section('content')
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-8">
-                    <div class="d-flex justify-content-start align-items-center">
-                        <a href="{{ route('quiz.index', ['id' => $quiz->id]) }}" class="text-secondary mr-2">
-                            <i class="fa fa-solid fa-arrow-left"></i>
-                        </a>
-                        <h2 class="h4"> {{ $quiz->title }} : </h2>
-                        <span style="font-size: 25px; margin-left: 5px"> questions: {{$questions->count()}}</span>
+    <div class="row">
+        <div class="col-8">
+            <div class="d-flex justify-content-start align-items-center">
+                <a href="{{ route('quiz.index', ['id' => $quiz->id]) }}" class="text-secondary mr-2">
+                    <i class="fa fa-solid fa-arrow-left"></i>
+                </a>
+                <h2 class="h4"> {{ $quiz->title }} : </h2>
+                <span style="font-size: 25px; margin-left: 5px"> questions: {{$questions->count()}}</span>
 
-                    </div>
-                </div>
-                <div class="col-4"><a href="{{ route('create.question',['id'=>0, 'quiz_id' => $quiz->id]) }}"
-                                      class="btn btn-success pull-right bradius">Add question</a></div>
             </div>
         </div>
+        <div class="col-4"><a href="{{ route('create.question',['id'=>0, 'quiz_id' => $quiz->id]) }}"
+                              class="btn btn-success pull-right bradius">Add question</a></div>
     </div>
-    <hr>
-    <div class="card">
-        @include('backend.partials.error')
+    <div class="card card-body" style="border-radius: 20px">
         @foreach ($questions as $key => $question)
-            <div class="card card-body">
+            <div class="card card-body bradius mb-2" style="border: 1px solid black">
                 <div class="row input_row">
                     <div class="col-md-12">
                         <div class="form-group">
@@ -86,22 +80,22 @@
                         @endforeach
                     </div>
                     <div class="col-2">
-                        <div class="row">
+                        <div class="row float-right">
                             <div class="col-4">
                                 <a href="{{ route('create.question',['id'=>$question->id, 'quiz_id' => $quiz->id]) }}"
-                                   class="btn btn-info bradius border-0">
-                                    <i class='fas fa-pen' style='font-size:22px; color: black'></i>
+                                   class="btn bradius border-0" style="background-color: #32d9f6">
+                                    <i class='fas fa-pen' style='font-size:16px; color: black'></i>
                                 </a>
                             </div>
                             <div class="col-4">
-                                <form action="{{ route('delete.question') }}" method="POST"
-                                      onsubmit="return confirm('Delete this record?');">
+                                <form action="{{ route('delete.question') }}" method="POST" id="deleteForm">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="id" value="{{ $question->id }}"/>
                                     <input type="hidden" name="quizID" value="{{ $quiz->id }}"/>
                                     <input type="hidden" name="_method" value="DELETE"/>
-                                    <button class="btn btn-danger bradius border-0">
-                                        <i class='fas fa-trash' style='font-size:22px; color: white'></i>
+                                    <button type="button" class="btn btn-danger bradius border-0"
+                                            data-toggle="modal" data-target="#deleteConfirmModal">
+                                        <i class='fas fa-trash' style='font-size: 16px; color: white'></i>
                                     </button>
                                 </form>
                             </div>
@@ -109,8 +103,47 @@
                     </div>
                 </div>
             </div>
-            <hr>
         @endforeach
+    </div>
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog"
+         aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="width: 300px; border-radius: 10px">
+                <div class="modal-header"
+                     style="background-color: #d6f1fa; display: flex; justify-content: center; align-items: center; height: 150px;">
+                    <div
+                        style="background-color: #abe0f6; border-radius: 100px; height: 100px; width: 100px; display: flex; justify-content: center; align-items: center;">
+                        <i class='fas fa-exclamation-triangle' style='font-size:48px; color:white;'></i>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <h4 class="ml-3">Do you want to delete</h4>
+                    <h4 style="margin-left: 80px">this question?</h4>
+                    <div class="row ml-2">
+                        <div class="col-6">
+                            <button type="button" class="btn btn-lg" style="border: 1px solid black; border-radius: 10px"
+                                    data-dismiss="modal">No
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-lg"
+                                    style="color:red; border: 1px solid black; border-radius: 10px"
+                                    id="confirmDeleteBtn">Yes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 @stop
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var deleteForm = document.getElementById('deleteForm');
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            deleteForm.submit();
+        });
+    });
+</script>

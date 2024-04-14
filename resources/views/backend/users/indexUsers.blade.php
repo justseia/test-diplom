@@ -37,12 +37,6 @@
             background-color: lightblue; /* Your desired color for the scrollbar thumb */
             border-radius: 5px; /* Optional: adds rounded corners to the scrollbar thumb */
         }
-
-        /* For Firefox */
-        .scrollable-div {
-            scrollbar-color: lightblue #e0e0e0; /* thumb and track color */
-        }
-
         /* Always show vertical scrollbar and ensure it's visible even if content doesn't overflow */
         .scrollable-div {
             overflow-y: scroll;

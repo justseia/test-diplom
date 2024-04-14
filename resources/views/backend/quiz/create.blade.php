@@ -34,7 +34,7 @@
                         <div class="mb-3">
                             <label for="inputName" class="form-label">Name:</label>
                             <input type="text" name="name" class="form-control" id="inputName"
-                                   placeholder="Enter your name" required>
+                                   placeholder="Enter name" required>
                         </div>
                         {{ csrf_field() }}
 

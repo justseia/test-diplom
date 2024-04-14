@@ -4,6 +4,33 @@
 
 @section('style')
     <style>
+        .image-wrapper {
+            position: relative;
+            display: inline-block; /* Adjust this as necessary for your layout */
+            max-width: 150px; /* Match this with your image dimensions if needed */
+            margin-right: 20px; /* Adjust this value to create the desired space */
+        }
+
+        .img-thumbnail {
+            display: block;
+            width: 100%; /* Ensure the image covers the area of the wrapper */
+            height: auto;
+        }
+
+        .edit-icon {
+            position: absolute;
+            bottom: 0;
+            right: -40px; /* Negative value moves icon outside of the image wrapper */
+            color: red;
+            font-size: 28px;
+            cursor: pointer; /* Suggests that the icon is interactive */
+            background: white; /* Add background to make icon stand out if needed */
+            border-radius: 50%; /* Optional: makes the background rounded */
+            padding: 5px; /* Optional: adds spacing inside the background */
+            margin-top: 10px;
+        }
+
+
         .active-orange {
             background-color: orange !important;
             color: white;
@@ -38,11 +65,6 @@
             border-radius: 5px; /* Optional: adds rounded corners to the scrollbar thumb */
         }
 
-        /* For Firefox */
-        .scrollable-div {
-            scrollbar-color: lightblue #e0e0e0; /* thumb and track color */
-        }
-
         /* Always show vertical scrollbar and ensure it's visible even if content doesn't overflow */
         .scrollable-div {
             overflow-y: scroll;
@@ -67,8 +89,8 @@
                     <h3>Quizes List</h3>
                 </div>
                 <div class="col-6 bradius">
-                        <a href="{{ route('quiz.create') }}"
-                           class="btn btn-success pull-right bradius">Create quiz</a>
+                    <a href="{{ route('quiz.create') }}"
+                       class="btn btn-success pull-right bradius">Create quiz</a>
                 </div>
             </div>
             <div class="row">
@@ -113,7 +135,7 @@
                     </div>
                 </div>
                 <div class="col-md-8">
-                    <div class="card bradius"  style="height: 900px;">
+                    <div class="card bradius" style="height: 900px;">
                         <div class="mt-2">
                             <div class="row m-2">
                                 <div class="col-6"><h4>Quiz info</h4></div>
@@ -123,9 +145,15 @@
                             <div class="card-body bradius" style="border: 2px solid black; margin: 15px">
                                 <div class="row">
                                     <div class="col-md-3">
-                                        <img
-                                            src="{{ !empty($selectedquiz->image_url) ? asset('storage/' . $selectedquiz->image_url) : 'https://via.placeholder.com/150' }}"
-                                            alt="Quiz Avatar" class="img-thumbnail  mx-auto d-block">
+                                        <div class="image-wrapper text-center">
+                                            <div class="image-wrapper text-center">
+                                                <img src="{{ !empty($selectedquiz->image_url) ? asset('storage/' . $selectedquiz->image_url) : 'https://via.placeholder.com/150' }}"
+                                                     alt="Quiz Avatar" class="img-thumbnail mx-auto d-block" id="quizImage">
+                                                <i class="fa fa-edit edit-icon mt-3" style="font-size:28px; color:red; cursor:pointer;"
+                                                   onclick="document.getElementById('imageInput').click();"></i>
+                                                <input type="file" id="imageInput" style="display: none;" onchange="uploadImage(this)"/>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-9">
                                         <label for="name">Name</label>
@@ -224,12 +252,13 @@
                                             </div>
                                             <div>
                                                 <form action="{{ route('quiz.destroy') }}" method="POST"
-                                                      onsubmit="return confirm('Delete this record?');">
+                                                      id="deleteForm">
                                                     {{ csrf_field() }}
                                                     <input type="hidden" name="id" value="{{ $quiz->id }}"/>
                                                     <input type="hidden" name="_method" value="DELETE"/>
-                                                    <button type="submit" name="Delete"
-                                                            class="btn btn-sm btn-danger bradius">Delete
+                                                    <button type="button" name="Delete"
+                                                            class="btn btn-sm btn-danger bradius"
+                                                            data-toggle="modal" data-target="#deleteConfirmModal">Delete
                                                         quiz
                                                     </button>
                                                 </form>
@@ -251,6 +280,40 @@
                 </div>
             </div>
         </div>
+        <!-- Modal -->
+        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog"
+             aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" style="width: 300px; border-radius: 10px">
+                    <div class="modal-header"
+                         style="background-color: #d6f1fa; display: flex; justify-content: center; align-items: center; height: 150px;">
+                        <div
+                            style="background-color: #abe0f6; border-radius: 100px; height: 100px; width: 100px; display: flex; justify-content: center; align-items: center;">
+                            <i class='fas fa-exclamation-triangle' style='font-size:48px; color:white;'></i>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <h4 class="ml-3">Do you want to delete</h4>
+                        <h4 style="margin-left: 80px">this quiz?</h4>
+                        <div class="row ml-2">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-lg"
+                                        style="border: 1px solid black; border-radius: 10px"
+                                        data-dismiss="modal">No
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-lg"
+                                        style="color:red; border: 1px solid black; border-radius: 10px"
+                                        id="confirmDeleteBtn">Yes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     @else
         @include('errors.401')
     @endif
@@ -269,4 +332,43 @@
             selectedElement.classList.add('active-orange');
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var deleteForm = document.getElementById('deleteForm');
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            deleteForm.submit();
+        });
+    });
+    function uploadImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                document.getElementById('quizImage').src = e.target.result;
+            };
+
+            reader.readAsDataURL(input.files[0]); // Preview the image
+
+            // Prepare the image file to be sent in a FormData object
+            var formData = new FormData();
+            formData.append('image', input.files[0]); // Append the file
+            formData.append('_token', '{{ csrf_token() }}'); // Append CSRF token
+            formData.append('id', '{{ $selectedquiz->id }}'); // Append the quiz ID
+
+            // Send the request to the server endpoint
+            fetch('{{ route("quiz.updateImage", $selectedquiz->id) }}', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Handle success
+                })
+                .catch((error) => {
+                    console.error('Error:', error); // Handle errors
+                });
+        }
+    }
+
 </script>

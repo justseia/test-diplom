@@ -85,6 +85,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('quiz/question/delete', 'deleteQuestion')->name('delete.question');
         Route::post('quiz/question/{quiz_id}', 'saveQuestion')->name('save.question');
         Route::delete('quiz/delete', 'destroy')->name('quiz.destroy');
+        Route::post('/quiz/update-image/{id}', 'updateImage')->name('quiz.updateImage');
+
     });
     Route::post('quiz/invite/{slug}', [\App\Http\Controllers\Backend\QuizShareController::class, 'invite'])->name('quiz.invite');
 
