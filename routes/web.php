@@ -27,13 +27,14 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
 Route::controller(QuizController::class)->group(function () {
     Route::get('quiz', 'index')->name('quiz');
 });
 
 Route::group(['middleware' => ['auth']], function () {
+    Route::get('/home', function () {
+        return redirect('/quiz');
+    });
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('search/user', [SearchUserController::class, 'search'])->name('search-user');
     Route::get('search/education', [SearchController::class, 'searchEducation'])->name('search-education');

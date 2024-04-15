@@ -23,18 +23,8 @@ class LoginController extends Controller
 
     use AuthenticatesUsers;
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    public const HOME = '/dashboard';
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
@@ -45,9 +35,19 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('dashboard');
-        }
+            // Authentication passed...
+            $user = Auth::user();
 
-        return redirect($this->redirectPath());
+            // Check user role and redirect accordingly
+            if ($user->hasRole('Super Admin')) { // Assuming you have a method to check user roles
+                return redirect()->intended(self::HOME);
+            } elseif ($user->hasRole('Teacher')) { // Assuming you have a method to check user roles
+                return redirect()->route('quiz.index');
+            } else{
+                return redirect()->intended('login');
+            }
+        }
+        return redirect()->route('login');
+
     }
 }

@@ -141,17 +141,21 @@
                                 <div class="col-6"><h4>Quiz info</h4></div>
                             </div>
                         </div>
-                        @if(!is_null($selectedquiz))
+                        @if(!empty($selectedquiz))
                             <div class="card-body bradius" style="border: 2px solid black; margin: 15px">
                                 <div class="row">
                                     <div class="col-md-3">
                                         <div class="image-wrapper text-center">
                                             <div class="image-wrapper text-center">
-                                                <img src="{{ !empty($selectedquiz->image_url) ? asset('storage/' . $selectedquiz->image_url) : 'https://via.placeholder.com/150' }}"
-                                                     alt="Quiz Avatar" class="img-thumbnail mx-auto d-block" id="quizImage">
-                                                <i class="fa fa-edit edit-icon mt-3" style="font-size:28px; color:red; cursor:pointer;"
+                                                <img
+                                                    src="{{ !empty($selectedquiz->image_url) ? asset('storage/' . $selectedquiz->image_url) : 'https://via.placeholder.com/150' }}"
+                                                    alt="Quiz Avatar" class="img-thumbnail mx-auto d-block"
+                                                    id="quizImage">
+                                                <i class="fa fa-edit edit-icon mt-3"
+                                                   style="font-size:28px; color:red; cursor:pointer;"
                                                    onclick="document.getElementById('imageInput').click();"></i>
-                                                <input type="file" id="imageInput" style="display: none;" onchange="uploadImage(this)"/>
+                                                <input type="file" id="imageInput" style="display: none;"
+                                                       onchange="uploadImage(this)"/>
                                             </div>
                                         </div>
                                     </div>
@@ -313,7 +317,6 @@
                 </div>
             </div>
         </div>
-
     @else
         @include('errors.401')
     @endif
@@ -340,35 +343,39 @@
             deleteForm.submit();
         });
     });
-    function uploadImage(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-                document.getElementById('quizImage').src = e.target.result;
-            };
-
-            reader.readAsDataURL(input.files[0]); // Preview the image
-
-            // Prepare the image file to be sent in a FormData object
-            var formData = new FormData();
-            formData.append('image', input.files[0]); // Append the file
-            formData.append('_token', '{{ csrf_token() }}'); // Append CSRF token
-            formData.append('id', '{{ $selectedquiz->id }}'); // Append the quiz ID
-
-            // Send the request to the server endpoint
-            fetch('{{ route("quiz.updateImage", $selectedquiz->id) }}', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data); // Handle success
-                })
-                .catch((error) => {
-                    console.error('Error:', error); // Handle errors
-                });
-        }
-    }
-
 </script>
+@if($selectedquiz instanceof \App\Models\Quiz)
+    // It's a single model instance
+    <script>
+        function uploadImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    document.getElementById('quizImage').src = e.target.result;
+                };
+
+                reader.readAsDataURL(input.files[0]); // Preview the image
+
+                // Prepare the image file to be sent in a FormData object
+                var formData = new FormData();
+                formData.append('image', input.files[0]); // Append the file
+                formData.append('_token', '{{ csrf_token() }}'); // Append CSRF token
+                formData.append('id', '{{ $selectedquiz->id }}'); // Append the quiz ID
+
+                // Send the request to the server endpoint
+                fetch('{{ route("quiz.updateImage", $selectedquiz->id) }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data); // Handle success
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error); // Handle errors
+                    });
+            }
+        }
+    </script>
+@endif

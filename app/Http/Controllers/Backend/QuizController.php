@@ -39,26 +39,33 @@ class QuizController extends Controller
         } else {
             $quizs = $this->quiz->where('author', auth()->id())->with('creator')->withCount('participants')->get();
         }
-        if ($request->id) {
-            $selectedquiz = $quizs->where('id', $request->id)->first();
+        if (!$quizs->isEmpty()) {
+            if ($request->id) {
+                $selectedquiz = $quizs->where('id', $request->id)->first();
+            } else {
+                $selectedquiz = $quizs->first();
+            }
+            $selectedquiz->participants_count = UserParticipant::where('quiz_id', $selectedquiz->id)->count();
+            $selectedquiz->participants_average_score = (int)UserParticipant::where('quiz_id', $selectedquiz->id)->avg('score');
+            $maxScore = UserParticipant::where('quiz_id', $selectedquiz->id)->max('score');
+            $participantsWithMaxScore = UserParticipant::with('user')
+                ->where('quiz_id', $selectedquiz->id)
+                ->where('score', $maxScore)
+                ->get();
+            $champ = '';
+            $champScore = '';
+            foreach ($participantsWithMaxScore as $participant) {
+                $champ = $participant->user->name . ", " . $participant->user->email;
+                $champScore = $participant->score . "%      " . $participant->created_at;
+            }
+            $selectedquiz->champName = $champ;
+            $selectedquiz->champScore = $champScore;
         } else {
-            $selectedquiz = $quizs->first();
+            $quizs = [];
+            $quizs = collect($quizs);
+
+            $selectedquiz = [];
         }
-        $selectedquiz->participants_count = UserParticipant::where('quiz_id', $selectedquiz->id)->count();
-        $selectedquiz->participants_average_score = (int)UserParticipant::where('quiz_id', $selectedquiz->id)->avg('score');
-        $maxScore = UserParticipant::where('quiz_id', $selectedquiz->id)->max('score');
-        $participantsWithMaxScore = UserParticipant::with('user')
-            ->where('quiz_id', $selectedquiz->id)
-            ->where('score', $maxScore)
-            ->get();
-        $champ = '';
-        $champScore = '';
-        foreach ($participantsWithMaxScore as $participant) {
-            $champ = $participant->user->name . ", " . $participant->user->email;
-            $champScore = $participant->score . "%      " . $participant->created_at;
-        }
-        $selectedquiz->champName = $champ;
-        $selectedquiz->champScore = $champScore;
         return view('backend.quiz.index', ['quizzes' => $quizs, 'selectedquiz' => $selectedquiz]);
     }
 
@@ -315,6 +322,7 @@ class QuizController extends Controller
 
         return redirect()->route('quiz.edit', $request->quizID);
     }
+
     public function updateImage(Request $request, $id)
     {
         $quiz = Quiz::find($id);
