@@ -26,6 +26,7 @@
 
         label {
             font-size: 25px;
+            margin-top: 15px;
         }
 
         /* For WebKit browsers like Chrome, Safari, and Edge */
@@ -108,7 +109,7 @@
                             </div>
                         </div>
                         @if(!is_null($selectedEducation))
-                            <div class="card-body bradius" style="border: 2px solid black; margin: 15px">
+                            <div class="card-body bradius" style="border: 2px solid black; margin: 15px; padding-left: 30px">
                                 <div class="row">
                                     <label for="title">Title</label>
                                     <input type="text" class="form-control spanStyle" id="title"

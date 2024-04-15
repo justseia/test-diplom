@@ -28,7 +28,7 @@ class EducationController extends Controller
         // Define the base URL for your images
         // This could be something like 'https://example.com/'
         $baseUrl = config('app.url') . '/storage'; // Assuming you have this configured in your app's config or .env
-        $baseUrl = 'http://127.0.0.1:8000' . '/storage'; // Assuming you have this configured in your app's config or .env
+        $baseUrl = url('storage/'); // Assuming you have this configured in your app's config or .env
 
         // If the education detail exists
         if ($education) {

@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
       git \
       curl \
       gnupg && \
+      mysql-client  \
       curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
       apt-get install -y nodejs && \
       docker-php-ext-install mysqli pdo pdo_mysql && \

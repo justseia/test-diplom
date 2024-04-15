@@ -180,6 +180,9 @@ class QuizController extends Controller
         $question->question = $request->question;
         $question->save();
 
+        $quiz->questions_count = $quiz->questions_count + 1;
+        $quiz->save();
+
         $saveOption = (new SaveQuizOption)->saveOptions($request, $question, $type);
 
         // });
@@ -280,6 +283,10 @@ class QuizController extends Controller
         }
 
         $question->save();
+
+        $quiz = Quiz::find($quiz_id);
+        $quiz->questions_count = $quiz->questions_count + 1;
+        $quiz->save();
 
         $existingOptions = $question->options;
 

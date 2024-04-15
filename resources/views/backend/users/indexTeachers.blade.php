@@ -26,6 +26,7 @@
 
         label {
             font-size: 20px;
+            margin-top: 12px;
         }
 
         /* For WebKit browsers like Chrome, Safari, and Edge */
@@ -89,10 +90,9 @@
                                             <h5 class="mb-1">{{ $user->email }}</h5>
                                         </div>
                                         <h5 class="mb-1">{{ $user->name }}</h5>
-                                        <h5>{{ $user->medcoins }} MEDC</h5>
                                     </div>
                                     <div class="col-3">
-                                        <i class='fa fa-angle-right mt-3 bradius {{ $selectedUser->id === $user->id ? 'active-icon' : 'default-icon' }}'
+                                        <i class='fa fa-angle-right mt-2 bradius {{ $selectedUser->id === $user->id ? 'active-icon' : 'default-icon' }}'
                                            style='font-size:36px; border: 1px solid black; width: 40px; height: 40px; display: flex;
            align-items: center; justify-content: center;'></i>
                                     </div>
@@ -118,7 +118,7 @@
                                             style="padding-left: 10px">{{    $selectedUser->email }}</span>
                                         <label for="">Quizzes count:</label> <span
                                             class="form-control-plaintext spanStyle"
-                                            style="padding-left: 10px">{{ $selectedUser->medcoins }}</span>
+                                            style="padding-left: 10px">{{ $selectedUser->QuizzesCount }}</span>
                                         <label for="">Total passed students of
                                             quizzes</label> <span
                                             class="form-control-plaintext spanStyle"

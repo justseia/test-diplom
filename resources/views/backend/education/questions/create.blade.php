@@ -34,9 +34,9 @@
     </div>
     <div class="card bradius">
         <div class="card-body">
-            <form method="POST" action="{{ route('education.save.question', $education->id) }}" enctype="multipart/form-data"
+            <form method="POST" action="{{ route('education.save.question', $education->id) }}"
+                  enctype="multipart/form-data"
                   id="questionForm">
-
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
@@ -93,7 +93,8 @@
                             <div class="position-relative">
                                 <img src="{{ $question->image_url }}" class="image-preview">
                                 <i class="fa fa-times-circle position-absolute top-0 end-0" aria-hidden="true"
-                                   onclick="removeImage(this)" style="font-size: 20px; color: red"></i>
+                                   onclick="removeImage(this,{{$question->id}})"
+                                   style="font-size: 20px; color: red"></i>
                             </div>
                         @endif
                     </div>
@@ -119,10 +120,30 @@
     </div>
 @stop
 <script>
-    function removeImage(element) {
-        // This will remove the image container div
-        element.parentNode.remove();
+    function removeImage(index, questionId = null) {
+        if (questionId) {
+            fetch(`/delete-question-image/${questionId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        console.log('Image deleted successfully');
+                        index.parentNode.remove();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        } else {
+            index.parentNode.remove();
+        }
     }
+
 
     document.addEventListener('DOMContentLoaded', function () {
         // Trigger file input when "+" icon is clicked

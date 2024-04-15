@@ -46,6 +46,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/import-education', [EducationController::class, 'import'])->name('import-education');
 
     Route::controller(EducationController::class)->group(function () {
+        Route::post('/delete-image', 'deleteImage');
+        Route::post('/delete-question-image/{id}', 'deleteQuestionImage');
         Route::get('/education', [EducationController::class, 'index'])->name('education.index');
         Route::get('/education/create', [EducationController::class, 'create'])->name('education.create');
         Route::post('/education', [EducationController::class, 'store'])->name('education.store');

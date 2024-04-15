@@ -2,13 +2,13 @@
     <div>
         <div class="navbar mb-4" style="border: 0;">
             <a href="{{ route('dashboard') }}" class="site_title">
-                <img src="{{asset('images/body_genuis.png')}}" alt="" width="150px" height="150/1.26px">
+                <img src="{{asset('images/body_genuis.png')}}" alt="" width="200px" height="200/1.26px">
             </a>
         </div>
     </div>
     <br/>
     <!-- sidebar menu -->
-    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu mt-5">
         <div class="menu_section">
             <ul class="nav side-menu" style="color: #1d2124">
 

@@ -69,10 +69,12 @@ class UserController extends Controller
             ->avg('score'); // Directly compute the average of scores from all participants of all quizzes
 
         $publicQuizzesCount = Quiz::where('is_private', false)->where('author', $selectedUser->id)->count();
+        $QuizzesCount = Quiz::where('author', $selectedUser->id)->count();
 
         $selectedUser->totalPassedStudents = (int)$totalPassedStudents;
         $selectedUser->averageScores = (int)$overallAverageScore;
         $selectedUser->publicQuizzesCount = (int)$publicQuizzesCount;
+        $selectedUser->QuizzesCount = (int)$QuizzesCount;
 
         return view('backend.users.indexTeachers')->with([
             'users' => $users,

@@ -9,6 +9,7 @@ use App\Models\Option;
 use App\Models\Question;
 use App\Models\Quiz;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use SimpleXMLElement;
 
@@ -22,11 +23,13 @@ class EducationController extends Controller
         $this->option = $option;
         $this->question = $question;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
+        $request->session()->forget('images_saved'); // Forget this session variable when an image is deleted
         $educations = Education::select('id', 'title', 'created_at')
             ->withCount('questions') // This adds a `questions_count` attribute to each Education model
             ->get();
@@ -54,53 +57,54 @@ class EducationController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request);
-        if (!empty($request->id)) {
-            $education = Education::find($request->id);
-            if (!empty($education)) {
-                $is_info = 1;
-                if (!empty($request->info)) {
-                    $education->info = $request->info;
-                }
-                if (!empty($request->diseases)) {
-                    $education->diseases = $request->diseases;
-                    $is_info = 0;
-                }
-                $maxUrlsPerEducation = 10;
-
-                if ($request->hasFile('images')) {
-                    foreach ($request->file('images') as $image) {
-                        if (EducationImages::where('education_id', $education->id)->count() >= $maxUrlsPerEducation) {
-                            // Maximum limit reached, handle accordingly (e.g., display an error message)
-                            return response()->json(['error' => 'Maximum limit of URLs reached for this education.'], 422);
-                        } else {
-                            // Store the uploaded image in storage/app/public directory
-                            $path = $image->store('public');
-                            $fileName = basename($path);
-
-                            $educationImages = EducationImages::create([
-                                'education_id' => $education->id,
-                                'url' => $fileName,
-                                'is_info' => $is_info
-                            ]);
-                        }
-                    }
-                }
-                $education->save();
-            }
-        } else {
-            $this->validate($request, [
-                'title' => 'required|max:120',
-            ]);
-
-            $education = Education::create([
-                'title' => $request->title
-            ]);
+        $education = Education::find($request->id);
+        if (!$education) {
+            return redirect()->back()->withErrors(['msg' => 'Education not found']);
         }
 
-        return redirect()->route('education.index');
+        $education->info = $request->info ?? $education->info;
+        $education->diseases = $request->diseases ?? $education->diseases;
 
+        if ($request->hasFile('images')) {
+            $this->processImages($request, $education);
+        }
+
+        $education->save();
+        return redirect()->route('education.index')->with('message', 'Education updated successfully.');
     }
+
+    private function processImages(Request $request, $education)
+    {
+        $maxUrlsPerEducation = 10;
+        $existingCountInfo = EducationImages::where('education_id', $education->id)->where('is_info', 1)->count();
+        $existingCountDieases = EducationImages::where('education_id', $education->id)->where('is_info', 0)->count();
+
+        foreach ($request->file('images') as $image) {
+            if ($request->has('info') && $existingCountInfo <= $maxUrlsPerEducation) {
+                $path = $image->store('public');
+                $fileName = basename($path);
+
+                EducationImages::create([
+                    'education_id' => $education->id,
+                    'url' => $fileName,
+                    'is_info' => 1
+                ]);
+                $existingCountInfo++;
+            }
+            if (!$request->has('info') && $existingCountDieases <= $maxUrlsPerEducation) {
+                $path = $image->store('public');
+                $fileName = basename($path);
+
+                EducationImages::create([
+                    'education_id' => $education->id,
+                    'url' => $fileName,
+                    'is_info' => 0
+                ]);
+                $existingCountDieases++;
+            }
+        }
+    }
+
 
     /**
      * Display the specified resource.
@@ -113,7 +117,7 @@ class EducationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit( $id)
+    public function edit($id)
     {
         $education = Education::where('id', $id)->firstOrFail();
 
@@ -143,10 +147,47 @@ class EducationController extends Controller
         //
     }
 
+    public function deleteImage(Request $request)
+    {
+        if ($request->type === 'info') {
+            $image = EducationImages::find($request->imageId);
+            if ($image) {
+                Storage::delete('public/' . $image->url);
+                if ($image->delete()) {
+                    return response()->json(['message' => 'Image deleted successfully'], 200);
+
+                }
+            }
+        } elseif ($request->type === 'diseases') {
+            $image = EducationImages::find($request->imageId);
+            if ($image) {
+                Storage::delete('public/' . $image->url);
+                $image->delete();
+            }
+            return response()->json(['message' => 'Image deleted successfully'], 200);
+        }
+        return response()->json(['error' => 'Image not found'], 404);
+
+    }
+
+    public function deleteQuestionImage($id)
+    {
+        $question = Question::find($id);
+        $question->image_url = null;
+        $question->save();
+
+        return response()->json(['message' => 'Image deleted successfully'], 200);
+    }
+    private function destroyImage($image)
+    {
+        // Optional: Delete the file from storage if necessary
+
+    }
+
     public function info($id)
     {
         $info = Education::select('id', 'title', 'info')->where('id', $id)->first();
-        $info_images = EducationImages::select('url')->where('education_id', $info->id)->where('is_info', 1)->get();
+        $info_images = EducationImages::select('id', 'url')->where('education_id', $info->id)->where('is_info', 1)->get();
         return view('backend.education.info')->with([
             'info' => $info,
             'info_images' => $info_images,
@@ -156,7 +197,7 @@ class EducationController extends Controller
     public function diseases($id)
     {
         $diseases = Education::select('id', 'title', 'diseases')->where('id', $id)->first();
-        $diseases_images = EducationImages::select('url')->where('education_id', $diseases->id)->where('is_info', 0)->get();
+        $diseases_images = EducationImages::select('id', 'url')->where('education_id', $diseases->id)->where('is_info', 0)->get();
 
         return view('backend.education.diseases')->with([
             'diseases' => $diseases,
@@ -189,6 +230,7 @@ class EducationController extends Controller
 
         return redirect()->route('education.index');
     }
+
     public function createQuestion($id, $education_id)
     {
         $question = [];
@@ -229,7 +271,7 @@ class EducationController extends Controller
             $file = $request->file('images');
 
             // Generate a unique file name or you can keep the original one
-            $fileName = uniqid('question_').'.'.$file->getClientOriginalExtension();
+            $fileName = uniqid('question_') . '.' . $file->getClientOriginalExtension();
 
             // Save the file to the local storage and get the path
             $filePath = $file->storeAs($destinationPath, $fileName, 'public');

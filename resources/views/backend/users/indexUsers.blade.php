@@ -26,6 +26,7 @@
 
         label {
             font-size: 20px;
+            margin-top: 12px;
         }
 
         /* For WebKit browsers like Chrome, Safari, and Edge */
@@ -37,10 +38,11 @@
             background-color: lightblue; /* Your desired color for the scrollbar thumb */
             border-radius: 5px; /* Optional: adds rounded corners to the scrollbar thumb */
         }
+
         /* Always show vertical scrollbar and ensure it's visible even if content doesn't overflow */
         .scrollable-div {
             overflow-y: scroll;
-            padding-right: 10px; /* Should be equal to or greater than the right padding of list-group-item for consistent alignment */
+            padding-right: 30px; /* Should be equal to or greater than the right padding of list-group-item for consistent alignment */
         }
 
         input[type="text"]::placeholder {
@@ -99,17 +101,18 @@
                         <div class="mt-2">
                             <div class="row m-2">
                                 <div class="col-6"><h4>User info</h4></div>
-                               {{-- <div class="col-6 bradius">
-                                    <a href="{{ route('user.create') }}" class="btn btn-success pull-right bradius">Add
-                                        User</a>
-                                </div>--}}
+                                {{-- <div class="col-6 bradius">
+                                     <a href="{{ route('user.create') }}" class="btn btn-success pull-right bradius">Add
+                                         User</a>
+                                 </div>--}}
                             </div>
                         </div>
                         <div class="card-body bradius" style="border: 1px solid black; margin: 10px; padding: 10px">
                             <div class="row">
                                 <div class="col-md-3">
                                     <img src="{{ asset('images/avatar.png') }}" alt="User Avatar"
-                                         class="img-thumbnail rounded-circle mx-auto d-block" width="120px" height="120px">
+                                         class="img-thumbnail rounded-circle mx-auto d-block" width="120px"
+                                         height="120px">
                                 </div>
                                 <div class="col-md-9">
                                     <label for="userName">Name</label>
@@ -124,10 +127,6 @@
                                     <label for="aboutUser">About</label>
                                     <textarea class="form-control spanStyle" id="aboutUser"
                                               rows="3">{{ $selectedUser->aboutMe }}</textarea>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 col-md-6">
                                     <label for="">Average Score Per Quiz:</label><span
                                         class="form-control-plaintext spanStyle"
                                         style="padding-left: 10px">{{   $selectedUser->average_score }}%</span>
@@ -152,9 +151,9 @@
                                         @csrf
                                         @method('DELETE')
                                     </form>
-
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -185,7 +184,7 @@
 
     function updateActiveRow(userId) {
         // Remove active-orange from all elements
-        document.querySelectorAll('.list-group-item').forEach(function(item) {
+        document.querySelectorAll('.list-group-item').forEach(function (item) {
             item.classList.remove('active-orange');
             item.classList.add('default-state');
         });

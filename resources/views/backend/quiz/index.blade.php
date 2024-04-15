@@ -276,7 +276,7 @@
                                     </div>
                                 </div>
 
-                                <a href="{{ route('quiz.edit', $quiz->id) }}"
+                                <a href="{{ route('quiz.edit', $selectedquiz->id) }}"
                                    class="btn mt-2 spanStyle  pull-right btn-sm btn-success">To question list →</a>
                             </div>
                         @endif
@@ -345,7 +345,6 @@
     });
 </script>
 @if($selectedquiz instanceof \App\Models\Quiz)
-    // It's a single model instance
     <script>
         function uploadImage(input) {
             if (input.files && input.files[0]) {
