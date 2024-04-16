@@ -52,7 +52,9 @@
         }
 
         label {
-            font-size: 20px;
+            font-size: 18px;
+            margin-top: 10px;
+            margin-bottom: 2px;
         }
 
         /* For WebKit browsers like Chrome, Safari, and Edge */
@@ -76,6 +78,15 @@
             color: #3dbdf1; /* Change to your desired color */
             font-family: Arial, 'Font Awesome 5 Free'; /* Ensure the icon font is applied */
         }
+        .modal-dialog {
+            display: flex;
+            align-items: center; /* This line ensures vertical centering */
+            min-height: calc(100% - (.5rem * 2)); /* This prevents the modal from touching the edges */
+        }
+
+        .modal-content {
+            margin: auto; /* Helps in centering the content inside the dialog if needed */
+        }
 
     </style>
 @stop
@@ -83,8 +94,8 @@
 @section('content')
 
     @if(auth()->user()->can('manage_quiz'))
-        <div class="container mt-4">
-            <div class="row">
+        <div class="container">
+            <div class="row mb-0">
                 <div class="col-6">
                     <h3>Quizes List</h3>
                 </div>
@@ -95,8 +106,8 @@
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <div class="card card-body bradius" style="height: 900px">
-                        <div class="mt-4 mb-3">
+                    <div class="card card-body bradius" style="height: 750px">
+                        <div class="mt-2 mb-2">
                             <form method="GET" action="{{ route('search-quiz') }}">
                                 <div class="input-group">
                                     <input type="text" name="title" class="form-control bradius"
@@ -109,10 +120,10 @@
                         @if($quizzes->isEmpty())
                             <p>No quizzes records found.</p>
                         @else
-                            <div class="list-group scrollable-div">
+                            <div class="list-group scrollable-div" style="height: 700px;">
                                 @foreach($quizzes as $quiz)
                                     <a href="{{ route('quiz.index', ['id' => $quiz->id]) }}"
-                                       class="list-group-item list-group-item-action bradius mb-3 {{ $quiz->id === $selectedquiz->id ? 'active-orange' : 'default-state' }}"
+                                       class="list-group-item list-group-item-action bradius mb-2 {{ $quiz->id === $selectedquiz->id ? 'active-orange' : 'default-state' }}"
                                        style="border-radius: 20px; border: 1px solid black"
                                        data-id="{{ $quiz->id }}">
                                         <div class="row">
@@ -135,9 +146,9 @@
                     </div>
                 </div>
                 <div class="col-md-8">
-                    <div class="card bradius" style="height: 900px;">
-                        <div class="mt-2">
-                            <div class="row m-2">
+                    <div class="card bradius p-1" style="height: 750px;">
+                        <div class="mt-1">
+                            <div class="row ml-3">
                                 <div class="col-6"><h4>Quiz info</h4></div>
                             </div>
                         </div>
@@ -177,24 +188,24 @@
                                 </div>
                                 <div class="row mt-2">
                                     <div class="col-6">
-                                        <div class="spanStyle text-white p-3 mb-3">
+                                        <div class="spanStyle text-white p-3 mb-2">
                                             Participants count
-                                            <h3>{{ $selectedquiz->participants_count}}</h3>
+                                            <h5>{{ $selectedquiz->participants_count}}</h5>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="spanStyle text-white p-3">
                                             Average score of participants
-                                            <h3>{{ $selectedquiz->participants_average_score}}%</h3>
+                                            <h5>{{ $selectedquiz->participants_average_score}}%</h5>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        <div class="spanStyle text-white p-3 mb-3">
+                                        <div class="spanStyle text-white p-3 mb-2">
                                             The champion of quiz
-                                            <h3>{{ $selectedquiz->champName}}</h3>
-                                            <h5>{{ $selectedquiz->champScore}}</h5>
+                                            <h4>{{ $selectedquiz->champName}}</h4>
+                                            <h6>{{ $selectedquiz->champScore}}</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -204,7 +215,7 @@
                                             <form action="{{ route('quiz.private') }}" method="POST"
                                                   onsubmit="return confirm('Make private this quiz?');">
                                                 {{ csrf_field() }}
-                                                <div class="input-group mb-3">
+                                                <div class="input-group mb-2">
                                                     <input type="hidden" name="id" value="{{ $selectedquiz->id }}"/>
                                                     <input type="hidden" name="_method" value="post"/>
                                                     <button type="submit" name="Public_quiz"
@@ -216,7 +227,7 @@
                                             <form action="{{ route('quiz.private') }}" method="POST"
                                                   onsubmit="return confirm('Make public this quiz?');">
                                                 {{ csrf_field() }}
-                                                <div class="input-group mb-3">
+                                                <div class="input-group mb-2">
                                                     <input type="hidden" name="id" value="{{ $selectedquiz->id }}"/>
                                                     <input type="hidden" name="_method" value="post"/>
                                                     <button type="submit" name="Private_quiz"
@@ -232,11 +243,11 @@
                                     <div class="col-6">
                                         <div class="row float-right">
                                             <div>
-                                                @if($quiz->is_active == 1)
+                                                @if($selectedquiz->is_active == 1)
                                                     <form action="{{ route('quiz.inactivate') }}" method="POST"
                                                           onsubmit="return confirm('Inactivate this quiz?');">
                                                         {{ csrf_field() }}
-                                                        <input type="hidden" name="id" value="{{ $quiz->id }}"/>
+                                                        <input type="hidden" name="id" value="{{ $selectedquiz->id }}"/>
                                                         <input type="hidden" name="_method" value="post"/>
                                                         <button type="submit" name="Inactive_quiz"
                                                                 class="btn btn-sm btn-success bradius">Active quiz
@@ -246,7 +257,7 @@
                                                     <form action="{{ route('quiz.activate') }}" method="POST"
                                                           onsubmit="return confirm('Activate this quiz?');">
                                                         {{ csrf_field() }}
-                                                        <input type="hidden" name="id" value="{{ $quiz->id }}"/>
+                                                        <input type="hidden" name="id" value="{{ $selectedquiz->id }}"/>
                                                         <input type="hidden" name="_method" value="post"/>
                                                         <button type="submit" name="Inactive_quiz"
                                                                 class="btn btn-sm btn-danger bradius">Inactive quiz
@@ -258,7 +269,7 @@
                                                 <form action="{{ route('quiz.destroy') }}" method="POST"
                                                       id="deleteForm">
                                                     {{ csrf_field() }}
-                                                    <input type="hidden" name="id" value="{{ $quiz->id }}"/>
+                                                    <input type="hidden" name="id" value="{{ $selectedquiz->id }}"/>
                                                     <input type="hidden" name="_method" value="DELETE"/>
                                                     <button type="button" name="Delete"
                                                             class="btn btn-sm btn-danger bradius"
@@ -277,7 +288,7 @@
                                 </div>
 
                                 <a href="{{ route('quiz.edit', $selectedquiz->id) }}"
-                                   class="btn mt-2 spanStyle  pull-right btn-sm btn-success">To question list →</a>
+                                   class="btn mt-1 spanStyle  pull-right btn-sm btn-success">To question list →</a>
                             </div>
                         @endif
                     </div>

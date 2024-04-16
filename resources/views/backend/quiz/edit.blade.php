@@ -37,6 +37,15 @@
             color: #1b1e21;
             border: 1px solid black;
         }
+        .modal-dialog {
+            display: flex;
+            align-items: center; /* This line ensures vertical centering */
+            min-height: calc(100% - (.5rem * 2)); /* This prevents the modal from touching the edges */
+        }
+
+        .modal-content {
+            margin: auto; /* Helps in centering the content inside the dialog if needed */
+        }
     </style>
 @stop
 
@@ -146,4 +155,5 @@
             deleteForm.submit();
         });
     });
+
 </script>

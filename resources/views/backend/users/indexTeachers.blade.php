@@ -25,8 +25,8 @@
         }
 
         label {
-            font-size: 20px;
-            margin-top: 12px;
+            font-size: 18px;
+            margin-top: 10px;
         }
 
         /* For WebKit browsers like Chrome, Safari, and Edge */
@@ -54,7 +54,7 @@
 @section('content')
 
     @if(auth()->user()->can('manage_user'))
-        <div class="container mt-4">
+        <div class="container">
             <div class="row">
                 <div class="col-6">
                     <h3>Teachers List</h3>
@@ -65,7 +65,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-4 card card-body bradius" style="height: 900px;">
+                <div class="col-md-4 card card-body bradius" style="height: 750px;">
                     <div class="mt-4 mb-3">
                         <form method="GET" action="{{ route('search-user') }}">
                             <div class="input-group">
@@ -78,7 +78,7 @@
                         </form>
                     </div>
 
-                    <div class="list-group scrollable-div" style="height: 900px;">
+                    <div class="list-group scrollable-div" style="height: 700px;">
                         @foreach($users as $user)
                             <a href="{{ route('user.getTeachers', ['id' => $user->id]) }}"
                                class="list-group-item list-group-item-action bradius mb-3 {{ $selectedUser->id === $user->id ? 'active-orange' : 'default-state' }}"
@@ -102,7 +102,7 @@
                     </div>
                 </div>
                 <div class="col-md-8">
-                    <div class="card bradius" style="height: 900px;">
+                    <div class="card bradius" style="height: 750px;">
                         <div class="row m-2">
                             <div class="col-6 mt-2"><h4>Teacher info</h4></div>
                         </div>
@@ -133,9 +133,18 @@
                                     </form>
                                 </div>
                             </div>
-                            <button type="button" style="background-color: red"
-                                    class="btn btn-danger mt-2 spanStyle  pull-right">Block teacher
-                            </button>
+                            <div class="col-12 col-md-12">
+                                <a href="{{ route('user.destroy', $selectedUser->id) }}"
+                                   onclick="event.preventDefault(); document.getElementById('delete-form').submit();"
+                                   class="btn btn-sm btn-danger mt-2 spanStyle pull-right"
+                                   style="background-color: red;">{{$selectedUser->blocked ? 'Unblock Teacher' : 'Block Teacher'}}</a>
+
+                                <form id="delete-form" action="{{ route('user.destroy', $selectedUser->id) }}"
+                                      method="POST" style="display: none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

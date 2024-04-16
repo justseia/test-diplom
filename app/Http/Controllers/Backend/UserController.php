@@ -257,9 +257,9 @@ class UserController extends Controller
         $user->blocked = $user->blocked ? 0 : 1;
         $user->save();
 
-        if ($user->role('User')) {
+        if ($user->hasRole('User')) {
             return redirect()->route('user.getUsers')->with('success', 'User successfully deleted.');
-        } elseif ($user->role('Teacher')) {
+        } elseif ($user->hasRole('Teacher')) {
             return redirect()->route('user.getTeachers')->with('success', 'User successfully deleted.');
         }
     }

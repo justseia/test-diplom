@@ -14,6 +14,24 @@
             max-height: 100px;
             margin-right: 1px;
         }
+        #loadingSpinnerContainer {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            z-index: 1050; /* Ensures it is above other content */
+        }
+
+        #loadingSpinner {
+            text-align: center; /* Centers the text below the spinner */
+            color: white;
+        }
+
     </style>
 @stop
 
@@ -55,8 +73,31 @@
                 <button class="btn btn-success bradius float-right" type="submit" id="saveButton">Save</button>
             </div>
         </form>
+        <div class="d-grid">
+            <!-- Loading Spinner Container -->
+            <div id="loadingSpinnerContainer" style="display: none; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1050;">
+                <div id="loadingSpinner">
+                    <img src="{{ asset('images/200.webp') }}" alt="Loading" style="border-radius: 100px"/>
+                </div>
+            </div>
+
+        </div>
+
     </div>
     <script>
+        function showSpinner() {
+            const spinnerContainer = document.getElementById('loadingSpinnerContainer');
+            spinnerContainer.style.display = 'flex'; // Show the spinner container
+            spinnerContainer.style.zIndex = 1050; // Bring it to the front
+        }
+
+        // Function to hide the spinner
+        function hideSpinner() {
+            const spinnerContainer = document.getElementById('loadingSpinnerContainer');
+            spinnerContainer.style.display = 'none'; // Hide the spinner container
+            spinnerContainer.style.zIndex = -1; // Send it to the back
+        }
+
         const uploadTrigger = document.getElementById('uploadTrigger');
         const fileInput = document.getElementById('fileInput');
         const form = document.getElementById('educationForm');
@@ -133,6 +174,8 @@
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
+            //showSpinner(); // Call to show the spinner
+
             const formData = new FormData();
             uploadedFiles.forEach((file) => {
                 formData.append('images[]', file);
@@ -152,7 +195,23 @@
                 },
                 body: formData,
                 credentials: 'same-origin' // Ensure cookies (including CSRF token cookie) are sent with the request
-            });
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json(); // or response.text() if the response is not JSON
+                })
+                .then(data => {
+                    // If you expect a specific property in data for a successful operation
+                    // e.g., data.success or data.redirectUrl
+                    window.location.href = data.redirectUrl; // Redirect to a success page or URL provided by the server
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    // Optionally implement error handling logic here
+                });
         });
+
     </script>
 @stop

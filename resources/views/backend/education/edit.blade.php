@@ -37,6 +37,15 @@
             color: #1b1e21;
             border: 1px solid black;
         }
+        .modal-dialog {
+            display: flex;
+            align-items: center; /* This line ensures vertical centering */
+            min-height: calc(100% - (.5rem * 2)); /* This prevents the modal from touching the edges */
+        }
+
+        .modal-content {
+            margin: auto; /* Helps in centering the content inside the dialog if needed */
+        }
     </style>
 @stop
 
@@ -94,9 +103,9 @@
                                     <input type="hidden" name="id" value="{{ $question->id }}"/>
                                     <input type="hidden" name="educationID" value="{{ $education->id }}"/>
                                     <input type="hidden" name="_method" value="DELETE"/>
-                                    <button class="btn btn-danger bradius border-0">
-                                        <i class='fas fa-trash' style='font-size:16px; color: white'></i>
-                                    </button>
+                                    <button type="button" class="btn btn-danger bradius border-0"
+                                            data-toggle="modal" data-target="#deleteConfirmModal">
+                                        <i class='fas fa-trash' style='font-size: 16px; color: white'></i>
                                 </form>
                             </div>
                         </div>
@@ -106,5 +115,45 @@
             <hr>
         @endforeach
     </div>
-
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog"
+         aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="width: 300px; border-radius: 10px">
+                <div class="modal-header"
+                     style="background-color: #d6f1fa; display: flex; justify-content: center; align-items: center; height: 150px;">
+                    <div
+                        style="background-color: #abe0f6; border-radius: 100px; height: 100px; width: 100px; display: flex; justify-content: center; align-items: center;">
+                        <i class='fas fa-exclamation-triangle' style='font-size:48px; color:white;'></i>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <h4 class="ml-3">Do you want to delete</h4>
+                    <h4 style="margin-left: 80px">this question?</h4>
+                    <div class="row ml-2">
+                        <div class="col-6">
+                            <button type="button" class="btn btn-lg" style="border: 1px solid black; border-radius: 10px"
+                                    data-dismiss="modal">No
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-lg"
+                                    style="color:red; border: 1px solid black; border-radius: 10px"
+                                    id="confirmDeleteBtn">Yes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var deleteForm = document.getElementById('deleteForm');
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            deleteForm.submit();
+        });
+    });
+
+</script>

@@ -54,7 +54,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/education/{education}', [EducationController::class, 'show'])->name('education.show');
         Route::get('/education/edit/{id}', [EducationController::class, 'edit'])->name('education.edit');
         Route::put('/education/{education}', [EducationController::class, 'update'])->name('education.update');
-        Route::delete('/education/{education}', [EducationController::class, 'destroy'])->name('education.destroy');
+        Route::delete('/education/delete', [EducationController::class, 'destroy'])->name('education.destroy');
 
         Route::get('education/{id}/info', 'info')->name('education.info');
         Route::post('/info', 'saveInfo')->name('education.saveInfo');

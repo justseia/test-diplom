@@ -42,6 +42,9 @@ class QuizController extends Controller
         if (!$quizs->isEmpty()) {
             if ($request->id) {
                 $selectedquiz = $quizs->where('id', $request->id)->first();
+                if (empty($selectedquiz)){
+                    $selectedquiz = $quizs->first();
+                }
             } else {
                 $selectedquiz = $quizs->first();
             }

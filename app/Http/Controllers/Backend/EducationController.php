@@ -52,25 +52,94 @@ class EducationController extends Controller
         return view('backend.education.create');
     }
 
+    /*
+
+    public function store(Request $request)
+    {
+        //dd($request);
+        if (!empty($request->id)) {
+            $education = Education::find($request->id);
+            if (!empty($education)) {
+                $is_info = 1;
+                if (!empty($request->info)) {
+                    $education->info = $request->info;
+                }
+                if (!empty($request->diseases)) {
+                    $education->diseases = $request->diseases;
+                    $is_info = 0;
+                }
+                $maxUrlsPerEducation = 10;
+
+                if ($request->hasFile('images')) {
+                    foreach ($request->file('images') as $image) {
+                        if (EducationImages::where('education_id', $education->id)->count() >= $maxUrlsPerEducation) {
+                            // Maximum limit reached, handle accordingly (e.g., display an error message)
+                            return response()->json(['error' => 'Maximum limit of URLs reached for this education.'], 422);
+                        } else {
+                            // Store the uploaded image in storage/app/public directory
+                            $path = $image->store('public');
+                            $fileName = basename($path);
+
+                            $educationImages = EducationImages::create([
+                                'education_id' => $education->id,
+                                'url' => $fileName,
+                                'is_info' => $is_info
+                            ]);
+                        }
+                    }
+                }
+                $education->save();
+            }
+        } else {
+            $this->validate($request, [
+                'name' => 'required|max:120',
+            ]);
+
+            $education = Education::create([
+                'name' => $request->name
+            ]);
+        }
+
+        return redirect()->route('education.index');
+
+    }
+     */
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $education = Education::find($request->id);
-        if (!$education) {
-            return redirect()->back()->withErrors(['msg' => 'Education not found']);
+        if (!empty($request->id)) {
+            $education = Education::find($request->id);
+            if (!empty($education)) {
+                $is_info = 1;
+                if (!empty($request->info)) {
+                    $education->info = $request->info;
+                }
+                if (!empty($request->diseases)) {
+                    $education->diseases = $request->diseases;
+                    $is_info = 0;
+                }
+            }
+            if ($request->hasFile('images')) {
+                $this->processImages($request, $education);
+            }
+
+            $education->save();
+            return response()->json([
+                'success' => true,
+                'redirectUrl' => action([EducationController::Class, 'index'])
+            ]);
+        } else {
+            $this->validate($request, [
+                'title' => 'required|max:120',
+            ]);
+
+            $education = Education::create([
+                'title' => $request->title
+            ]);
         }
-
-        $education->info = $request->info ?? $education->info;
-        $education->diseases = $request->diseases ?? $education->diseases;
-
-        if ($request->hasFile('images')) {
-            $this->processImages($request, $education);
-        }
-
-        $education->save();
-        return redirect()->route('education.index')->with('message', 'Education updated successfully.');
+        return redirect()->action([EducationController::Class, 'index']);
     }
 
     private function processImages(Request $request, $education)
@@ -142,9 +211,20 @@ class EducationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $education = Education::find($request->id);
+        if ($education) {
+            if (!empty($education->images())){
+                $education->images()->delete();
+            }
+            if (!empty($education->questions())){
+                $education->questions()->delete();
+            }
+            $education->delete(); // This triggers the deleting event
+        }
+        return redirect()->route('education.index')->with('message', 'Education deleted successfully.');
+
     }
 
     public function deleteImage(Request $request)
@@ -178,6 +258,7 @@ class EducationController extends Controller
 
         return response()->json(['message' => 'Image deleted successfully'], 200);
     }
+
     private function destroyImage($image)
     {
         // Optional: Delete the file from storage if necessary

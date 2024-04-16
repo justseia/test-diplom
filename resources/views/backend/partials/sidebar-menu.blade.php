@@ -1,4 +1,4 @@
-<div class="left_col scroll-view">
+<div class="scroll-view">
     <div>
         <div class="navbar mb-4" style="border: 0;">
             <a href="{{ route('dashboard') }}" class="site_title">

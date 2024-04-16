@@ -25,8 +25,9 @@
         }
 
         label {
-            font-size: 20px;
-            margin-top: 12px;
+            font-size: 18px;
+            margin-top: 10px;
+            margin-bottom: 2px;
         }
 
         /* For WebKit browsers like Chrome, Safari, and Edge */
@@ -56,11 +57,11 @@
 @section('content')
 
     @if(auth()->user()->can('manage_user'))
-        <div class="container mt-4">
+        <div class="container mt-2">
             <h3>Users List</h3>
             <div class="row">
-                <div class="col-md-4 card card-body bradius" style="height: 900px;">
-                    <div class="mt-4 mb-3">
+                <div class="col-md-4 card card-body bradius" style="height: 750px;">
+                    <div class="mt-2 mb-2">
                         <form method="GET" action="{{ route('search-user') }}">
                             <div class="input-group">
                                 <input type="text" name="name" class="form-control bradius"
@@ -72,7 +73,7 @@
                         </form>
                     </div>
 
-                    <div class="list-group scrollable-div">
+                    <div class="list-group scrollable-div" style="height: 700px;">
                         @foreach($users as $user)
                             <a href="{{ route('user.getUsers', ['id' => $user->id]) }}"
                                class="list-group-item list-group-item-action bradius mb-3 {{ $selectedUser->id === $user->id ? 'active-orange' : 'default-state' }}"
@@ -97,17 +98,15 @@
                     </div>
                 </div>
                 <div class="col-md-8">
-                    <div class="card bradius" style="height: 900px;">
-                        <div class="mt-2">
-                            <div class="row m-2">
-                                <div class="col-6"><h4>User info</h4></div>
-                                {{-- <div class="col-6 bradius">
-                                     <a href="{{ route('user.create') }}" class="btn btn-success pull-right bradius">Add
-                                         User</a>
-                                 </div>--}}
-                            </div>
+                    <div class="card bradius p-1" style="height: 750px;">
+                        <div class="row ml-3 mt-1">
+                            <div class="col-6"><h4>User info</h4></div>
+                            {{-- <div class="col-6 bradius">
+                                 <a href="{{ route('user.create') }}" class="btn btn-success pull-right bradius">Add
+                                     User</a>
+                             </div>--}}
                         </div>
-                        <div class="card-body bradius" style="border: 1px solid black; margin: 10px; padding: 10px">
+                        <div class="card-body bradius mx-2 p-1" style="border: 1px solid black;">
                             <div class="row">
                                 <div class="col-md-3">
                                     <img src="{{ asset('images/avatar.png') }}" alt="User Avatar"
@@ -125,25 +124,24 @@
                                     <input type="email" class="form-control spanStyle" id="userEmail"
                                            placeholder="Enter email" value="{{ $selectedUser->email }}">
                                     <label for="aboutUser">About</label>
-                                    <textarea class="form-control spanStyle" id="aboutUser"
-                                              rows="3">{{ $selectedUser->aboutMe }}</textarea>
+                                    <textarea class="form-control spanStyle" id="aboutUser">{{ $selectedUser->aboutMe }}</textarea>
                                     <label for="">Average Score Per Quiz:</label><span
-                                        class="form-control-plaintext spanStyle"
+                                        class="form-control spanStyle"
                                         style="padding-left: 10px">{{   $selectedUser->average_score }}%</span>
                                     <label for="">Passed Quizzes:</label> <span
-                                        class="form-control-plaintext spanStyle"
+                                        class="form-control spanStyle"
                                         style="padding-left: 10px">{{    $selectedUser->passed_quizzes }}</span>
                                     <label for="">MEDC:</label> <span
-                                        class="form-control-plaintext spanStyle"
+                                        class="form-control  spanStyle"
                                         style="padding-left: 10px">{{ $selectedUser->medcoins }}</span>
                                     <label for="">Created At:</label> <span
-                                        class="form-control-plaintext spanStyle"
+                                        class="form-control spanStyle"
                                         style="padding-left: 10px">{{   $selectedUser->created_at->format('d.m.Y') }}</span>
                                 </div>
                                 <div class="col-12 col-md-12">
                                     <a href="{{ route('user.destroy', $selectedUser->id) }}"
                                        onclick="event.preventDefault(); document.getElementById('delete-form').submit();"
-                                       class="btn btn-danger mt-2 spanStyle pull-right"
+                                       class="btn btn-sm btn-danger mt-2 spanStyle pull-right"
                                        style="background-color: red;">{{$selectedUser->blocked ? 'Unblock User' : 'Block User'}}</a>
 
                                     <form id="delete-form" action="{{ route('user.destroy', $selectedUser->id) }}"
